@@ -1,0 +1,93 @@
+export const SERVICE_AREAS = [
+  {
+    id: "alberta",
+    name: "Alberta",
+    tagline: "Provincial Headquarters & Central QEII Corridor",
+    isHomeBase: true,
+    description:
+      "Headquartered in Red Deer, Alberta, Brothers Hotshot Services is strategically located in the heart of the Calgary–Edmonton corridor. This central positioning allows rapid deployment northward to Edmonton and the oil sands, or southward to Calgary and Southern Alberta.",
+    keyHubs: [
+      "Red Deer (Home Base)",
+      "Calgary",
+      "Edmonton",
+      "Grande Prairie",
+      "Fort McMurray",
+      "Lethbridge & Medicine Hat",
+    ],
+    primaryCorridors: ["Highway 2 (QEII)", "Highway 63", "Highway 16 (Yellowhead)", "Highway 1 (Trans-Canada)"],
+    specialty: "Oilfield parts, heavy equipment, urgent construction components, and regional fabrication materials.",
+    badge: "Central Headquarters",
+  },
+  {
+    id: "saskatchewan",
+    name: "Saskatchewan",
+    tagline: "Direct Prairie Freight & Resource Corridor",
+    isHomeBase: false,
+    description:
+      "We provide prompt cross-border freight transit between Alberta and Saskatchewan, servicing key agricultural, potash mining, and industrial centres across the province with dependable flatbed transport.",
+    keyHubs: [
+      "Saskatoon",
+      "Regina",
+      "Lloydminster (Border City)",
+      "Moose Jaw",
+      "Swift Current",
+      "Prince Albert",
+    ],
+    primaryCorridors: ["Highway 16 (Yellowhead)", "Highway 1 (Trans-Canada)", "Highway 11"],
+    specialty: "Agricultural machinery, mining components, structural steel, and urgent replacement assemblies.",
+    badge: "Direct Prairie Link",
+  },
+  {
+    id: "british-columbia",
+    name: "British Columbia",
+    tagline: "Interprovincial Mountain & Coastal Transit",
+    isHomeBase: false,
+    description:
+      "Connecting Alberta with British Columbia's interior, Peace Region, and Lower Mainland. Our drivers are accustomed to mountain pass navigation and winter driving conditions along major B.C. commercial routes.",
+    keyHubs: [
+      "Vancouver & Lower Mainland",
+      "Kamloops & Kelowna (Okanagan)",
+      "Prince George",
+      "Dawson Creek & Fort St. John (Peace Region)",
+      "Cranbrook & Kootenays",
+    ],
+    primaryCorridors: ["Highway 1 (Trans-Canada)", "Highway 5 (Coquihalla)", "Highway 97 (Alaska Hwy)", "Highway 16"],
+    specialty: "Industrial tools, forestry machinery, project materials, and expedited marine/port equipment.",
+    badge: "Pacific & Interior Access",
+  },
+  {
+    id: "manitoba",
+    name: "Manitoba",
+    tagline: "Extended Interprovincial Long-Haul Freight",
+    isHomeBase: false,
+    description:
+      "Brothers Hotshot Services bridges Alberta and Manitoba with direct long-haul hotshot runs. We deliver payloads from western supply chains straight to Manitoba manufacturing plants, agricultural processors, and commercial distribution yards.",
+    keyHubs: [
+      "Brandon",
+      "Portage la Prairie",
+      "Thompson (Northern Transit)",
+      "Steinbach",
+      "Selkirk",
+    ],
+    primaryCorridors: ["Highway 1 (Trans-Canada)", "Highway 16 (Yellowhead Highway)"],
+    specialty: "Heavy mechanical components, bulk project materials, urgent shipments, and commercial inventory.",
+    badge: "Prairie Long-Haul",
+  },
+  {
+    id: "winnipeg",
+    name: "Winnipeg",
+    tagline: "Major Western Logistics & Transportation Hub",
+    isHomeBase: false,
+    description:
+      "As a major Canadian crossroads for freight and rail logistics, Winnipeg is a primary destination in our scheduled service matrix. We deliver time-critical shipments into Winnipeg distribution centres and pick up westbound hotshot loads without delays.",
+    keyHubs: [
+      "Winnipeg Metropolitan Area",
+      "CentrePort Canada Trade Zone",
+      "Industrial Parks (St. James, Inkster, Transcona)",
+      "Perimeter Highway Connections",
+    ],
+    primaryCorridors: ["Trans-Canada Highway 1", "Perimeter Highway 100/101", "Highway 75"],
+    specialty: "Distribution centre drops, time-critical manufacturing freight, aerospace components, and commercial supplies.",
+    badge: "Key Strategic Metro",
+  },
+];
