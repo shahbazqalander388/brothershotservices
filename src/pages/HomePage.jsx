@@ -310,8 +310,8 @@ ${contactData.message.trim()}
       <section id="hero" className="relative carbon-pattern border-b border-white/10 py-12 sm:py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Column: Headlines & Action Buttons */}
-            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left">
+            {/* Left Column: Headlines & Action Buttons (order-2 on mobile, order-1 on desktop) */}
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left order-2 lg:order-1">
               {/* Badge Pill */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40 max-w-full">
                 <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping shrink-0" />
@@ -373,9 +373,9 @@ ${contactData.message.trim()}
               </div>
             </div>
 
-            {/* Right Column: OFFICIAL LOGO SHIELD SHOWN FULLY */}
-            <div className="lg:col-span-5 flex justify-center lg:justify-end mt-4 lg:mt-0">
-              <div className="relative w-full max-w-[320px] sm:max-w-[380px]">
+            {/* Right Column: OFFICIAL LOGO SHIELD (order-1 on mobile so it appears at START, order-2 on desktop) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2 mb-2 lg:mb-0">
+              <div className="relative w-full max-w-[260px] xs:max-w-[290px] sm:max-w-[340px] lg:max-w-[380px] mx-auto">
                 {/* Glow behind emblem */}
                 <div className="absolute -inset-2 bg-[#D4AF37]/20 rounded-3xl blur-2xl opacity-70" />
                 
@@ -386,7 +386,7 @@ ${contactData.message.trim()}
                     <img
                       src={BUSINESS_INFO.logoUrl}
                       alt="Brothers Hotshot Services Official Logo"
-                      className="w-full h-auto max-h-[360px] object-contain block mx-auto"
+                      className="w-full h-auto max-h-[300px] sm:max-h-[360px] object-contain block mx-auto"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = BUSINESS_INFO.cloudinaryLogo;
@@ -394,7 +394,7 @@ ${contactData.message.trim()}
                     />
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs">
+                  <div className="mt-2.5 sm:mt-3 pt-2.5 sm:pt-3 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs">
                     <div className="flex items-center gap-1.5 text-gray-300">
                       <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
                       <span>Red Deer Hub, AB</span>
