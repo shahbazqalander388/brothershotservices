@@ -201,7 +201,7 @@ Requested via Brothers Hotshot Services Online Quote Form.`;
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          placeholder="e.g. 587-377-2452"
+                          placeholder="e.g. 587-377-0880"
                           className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
                             errors.phone ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
                           } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none transition-colors`}

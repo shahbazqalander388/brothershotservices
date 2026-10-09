@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Phone, Mail, Menu, X, ArrowRight, ChevronRight } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 
@@ -7,6 +7,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const prevPathRef = useRef(location.pathname);
 
   // Close mobile menu on route change
@@ -14,6 +15,7 @@ export default function Navbar() {
     if (prevPathRef.current !== location.pathname) {
       prevPathRef.current = location.pathname;
       setIsOpen(false);
+      document.body.style.overflow = '';
     }
   }, [location.pathname]);
 
@@ -26,10 +28,23 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock background scroll only when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const navLinks = [
     { name: 'Home', href: '/#hero' },
     { name: 'About', href: '/#about' },
     { name: 'Services', href: '/#services' },
+    { name: 'Fleet', href: '/#gallery' },
     { name: 'Service Areas', href: '/#service-areas' },
     { name: 'Careers', href: '/#careers' },
     { name: 'Quote', href: '/#quote' },
@@ -38,20 +53,25 @@ export default function Navbar() {
 
   const handleNavClick = (e, href) => {
     setIsOpen(false);
+    document.body.style.overflow = '';
+
     if (href.startsWith('/#')) {
       const targetId = href.replace('/#', '');
-      const elem = document.getElementById(targetId);
-      if (elem) {
+      if (location.pathname === '/') {
         e.preventDefault();
-        // Offset for the fixed header (approx 85px)
-        const headerOffset = 85;
-        const elementPosition = elem.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
-        window.history.pushState(null, '', href);
+        const elem = document.getElementById(targetId);
+        if (elem) {
+          const headerOffset = 85;
+          const elementPosition = elem.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+          window.history.pushState(null, '', href);
+        }
+      } else {
+        navigate(href);
       }
     }
   };
@@ -180,9 +200,18 @@ export default function Navbar() {
             </div>
           </div>
 
+          {/* Backdrop overlay for mobile menu to catch outside clicks & prevent background scroll */}
+          {isOpen && (
+            <div
+              className="fixed inset-0 top-[74px] sm:top-[84px] bg-black/80 backdrop-blur-sm z-40 lg:hidden touch-none"
+              onClick={() => setIsOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+
           {/* Mobile Full Dropdown Menu Drawer */}
           {isOpen && (
-            <div className="lg:hidden bg-[#0B0B0D] border-b border-[#D4AF37]/30 px-4 py-5 space-y-3 animate-fadeIn shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto">
+            <div className="lg:hidden relative z-50 bg-[#0B0B0D] border-b border-[#D4AF37]/30 px-4 py-5 space-y-3 animate-fadeIn shadow-2xl max-h-[calc(100vh-85px)] overflow-y-auto overscroll-contain">
               <div className="space-y-1">
                 {navLinks.map((link) => (
                   <a

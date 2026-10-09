@@ -20,6 +20,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 85px;
     background-color: #0B0B0D;
     color: #E5E7EB;
     font-family: var(--font-body);

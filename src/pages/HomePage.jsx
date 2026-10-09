@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, 
   Phone, 
@@ -12,15 +12,19 @@ import {
   Zap, 
   Compass, 
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   Send,
   Upload,
   FileText,
   AlertCircle,
   ExternalLink,
-  Info
+  Info,
+  Maximize2,
+  X,
+  Camera
 } from 'lucide-react';
-import { BUSINESS_INFO } from '../data/businessInfo';
+import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
 import EmailClientModal from '../components/EmailClientModal';
@@ -36,6 +40,21 @@ const iconMap = {
 };
 
 export default function HomePage() {
+  // Lightbox Modal State for Fleet Images
+  const [lightboxImage, setLightboxImage] = useState(null);
+
+  // Lock background scroll only when lightbox modal is open
+  useEffect(() => {
+    if (lightboxImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [lightboxImage]);
+
   // Modal State for Email Client
   const [modalState, setModalState] = useState({
     isOpen: false,
@@ -307,7 +326,7 @@ ${contactData.message.trim()}
       {/* ========================================================
           1. HERO SECTION (FULL LOGO & METALLIC INDUSTRIAL THEME)
       ======================================================== */}
-      <section id="hero" className="relative carbon-pattern border-b border-white/10 py-12 sm:py-16 lg:py-20">
+      <section id="hero" className="relative carbon-pattern border-b border-white/10 py-12 sm:py-16 lg:py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column: Headlines & Action Buttons (order-2 on mobile, order-1 on desktop) */}
@@ -352,10 +371,10 @@ ${contactData.message.trim()}
                 </a>
 
                 <a
-                  href="#services"
+                  href="#gallery"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 sm:py-4 rounded-xl bg-[#17171C] hover:bg-[#202026] text-white font-semibold text-sm sm:text-base border border-white/20 hover:border-[#D4AF37]/60 transition-all cursor-pointer min-h-[48px] active:scale-[0.98]"
                 >
-                  <span>Explore Our Services</span>
+                  <span>View Our Fleet</span>
                   <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4AF37]" />
                 </a>
               </div>
@@ -402,6 +421,43 @@ ${contactData.message.trim()}
                     <div className="flex items-center gap-1.5 text-[#F5E6B3] font-medium">
                       <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
                       <span>24/7 Hotshot Dispatch</span>
+                    </div>
+                  </div>
+
+                  {/* Quick Fleet Thumbnail Preview Row */}
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-semibold text-gray-300 flex items-center gap-1.5">
+                        <Camera className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        <span>Fleet in Action</span>
+                      </span>
+                      <a
+                        href="#gallery"
+                        className="text-[10px] text-[#D4AF37] hover:underline font-semibold"
+                      >
+                        View Gallery →
+                      </a>
+                    </div>
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {FLEET_IMAGES.map((img) => (
+                        <button
+                          key={img.id}
+                          type="button"
+                          onClick={() => setLightboxImage(img)}
+                          title={img.title}
+                          className="relative aspect-square rounded-lg overflow-hidden border border-white/15 hover:border-[#D4AF37] transition-all group/thumb focus:outline-none"
+                        >
+                          <img
+                            src={img.url}
+                            alt={img.title}
+                            className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = img.cloudinaryUrl;
+                            }}
+                          />
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -614,7 +670,98 @@ ${contactData.message.trim()}
       </section>
 
       {/* ========================================================
-          4. SERVICE AREAS SECTION
+          4. FLEET & EQUIPMENT GALLERY SECTION (#gallery)
+      ======================================================== */}
+      <section id="gallery" className="py-16 sm:py-20 lg:py-24 border-b border-white/10 bg-[#0B0B0D] relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
+              Real Equipment & Operations
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-white tracking-tight">
+              Our Fleet & Capabilities in Action
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base lg:text-lg">
+              Explore our heavy haulers, specialized trailers, industrial freight units, and interprovincial transport network across Western Canada.
+            </p>
+          </div>
+
+          {/* Featured Fleet Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {FLEET_IMAGES.map((item, index) => (
+              <div
+                key={item.id}
+                onClick={() => setLightboxImage(item)}
+                className="group relative rounded-2xl bg-[#131317] border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-center items-center"
+              >
+                {/* Full Uncropped Image Container */}
+                <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
+                  <img
+                    src={item.url}
+                    alt={item.title}
+                    loading="lazy"
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = item.cloudinaryUrl;
+                    }}
+                  />
+
+                  {/* Subtle expand icon on hover */}
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <span className="w-8 h-8 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
+                      <Maximize2 className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* 6th Card: Book Your Load Card with Call-Out */}
+            <div className="rounded-2xl bg-gradient-to-br from-[#1C1C24] via-[#141418] to-[#121216] border border-[#D4AF37]/60 p-6 flex flex-col justify-between space-y-5 shadow-xl">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#F5E6B3] text-[11px] font-semibold">
+                  <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>24/7 Availability</span>
+                </div>
+                <h3 className="text-2xl font-black text-white">
+                  Book Your Load Today!
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Fast, safe, and dependable hotshot delivery throughout Alberta, Saskatchewan, British Columbia, and Manitoba (including Winnipeg).
+                </p>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1 text-xs text-gray-300">
+                  <p className="text-white font-semibold flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Every Load. Every Time.</span>
+                  </p>
+                  <p className="text-gray-400">Direct point-to-point transport for machines, parts, and materials.</p>
+                </div>
+              </div>
+
+              <div className="space-y-2.5 pt-2 border-t border-white/10">
+                <a
+                  href="#quote"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm tracking-wide shadow-lg min-h-[44px]"
+                >
+                  <span>Request Instant Quote</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+                <a
+                  href={BUSINESS_INFO.phoneTel}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white font-bold text-xs hover:text-[#D4AF37] min-h-[40px]"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          5. SERVICE AREAS SECTION
       ======================================================== */}
       <section id="service-areas" className="py-16 sm:py-20 lg:py-24 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -684,6 +831,43 @@ ${contactData.message.trim()}
                 </div>
               </div>
             ))}
+
+            {/* Visual Route Network Card (fleet-3) */}
+            <div 
+              onClick={() => setLightboxImage(FLEET_IMAGES[2])}
+              className="rounded-2xl bg-[#121216] border border-white/10 hover:border-[#D4AF37]/60 overflow-hidden shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer group"
+            >
+              <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
+                <img
+                  src="/images/fleet-3.jpg"
+                  alt="Connecting Western Canada Hotshot Network"
+                  className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = FLEET_IMAGES[2].cloudinaryUrl;
+                  }}
+                />
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <span className="w-8 h-8 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
+                    <Maximize2 className="w-4 h-4" />
+                  </span>
+                </div>
+              </div>
+              <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-lg font-bold text-white group-hover:text-[#F5E6B3] transition-colors">
+                    Connecting Western Canada
+                  </h4>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Direct freight routes between Alberta, Saskatchewan, British Columbia, and Manitoba including Winnipeg.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-[#D4AF37] font-semibold">
+                  <span>View network map</span>
+                  <Maximize2 className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            </div>
 
             {/* Direct Dispatch Card */}
             <div className="rounded-2xl bg-gradient-to-br from-[#1C1C24] to-[#121216] border border-[#D4AF37]/50 p-6 flex flex-col justify-between space-y-5">
@@ -1035,7 +1219,7 @@ ${contactData.message.trim()}
                     name="phone"
                     value={quoteData.phone}
                     onChange={handleQuoteChange}
-                    placeholder="e.g. 587-377-2452"
+                    placeholder="e.g. 587-377-0880"
                     className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
                       quoteErrors.phone ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
                     } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
@@ -1340,6 +1524,105 @@ ${contactData.message.trim()}
         selectedFile={modalState.selectedFile}
         isJobApplication={modalState.isJobApplication}
       />
+
+      {/* Fleet Image Fullscreen Lightbox Modal */}
+      {lightboxImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lightbox-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setLightboxImage(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/90 backdrop-blur-md animate-fadeIn overscroll-contain"
+        >
+          <div className="relative w-full max-w-4xl max-h-[95vh] bg-[#121216] border border-[#D4AF37]/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col overscroll-contain">
+            {/* Top Bar */}
+            <div className="px-4 sm:px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#17171C]">
+              <div className="min-w-0 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
+                <h3 id="lightbox-title" className="text-white text-xs sm:text-sm font-bold tracking-wide">
+                  Brothers Hotshot Services • Fleet & Equipment
+                </h3>
+              </div>
+              <button
+                onClick={() => setLightboxImage(null)}
+                aria-label="Close photo preview"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 ml-2"
+              >
+                <X className="w-5 h-5 text-gray-300" />
+              </button>
+            </div>
+
+            {/* Main Image Preview Area */}
+            <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden p-2 sm:p-4 min-h-[300px]">
+              <img
+                src={lightboxImage.url}
+                alt={lightboxImage.title}
+                className="max-h-[78vh] max-w-full object-contain mx-auto rounded-lg shadow-2xl select-none"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = lightboxImage.cloudinaryUrl;
+                }}
+              />
+
+              {/* Prev Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currIdx = FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id);
+                  const prevIdx = (currIdx - 1 + FLEET_IMAGES.length) % FLEET_IMAGES.length;
+                  setLightboxImage(FLEET_IMAGES[prevIdx]);
+                }}
+                aria-label="Previous photo"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 hover:border-[#D4AF37] text-white transition-all cursor-pointer shadow-lg active:scale-95"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currIdx = FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id);
+                  const nextIdx = (currIdx + 1) % FLEET_IMAGES.length;
+                  setLightboxImage(FLEET_IMAGES[nextIdx]);
+                }}
+                aria-label="Next photo"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 hover:border-[#D4AF37] text-white transition-all cursor-pointer shadow-lg active:scale-95"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            {/* Bottom Bar Details & CTAs */}
+            <div className="p-3 sm:p-4 bg-[#17171C] border-t border-white/10 flex items-center justify-between gap-3 text-xs sm:text-sm">
+              <span className="text-xs text-gray-400 hidden sm:inline">
+                Click arrows to browse photos
+              </span>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <a
+                  href={BUSINESS_INFO.phoneTel}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-white hover:text-[#D4AF37] text-xs font-semibold min-h-[38px]"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Call: {BUSINESS_INFO.phone}</span>
+                </a>
+                <a
+                  href="#quote"
+                  onClick={() => setLightboxImage(null)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-gradient text-[#0B0B0D] text-xs font-extrabold shadow-md min-h-[38px]"
+                >
+                  <span>Get Quote</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

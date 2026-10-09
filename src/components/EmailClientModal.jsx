@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Copy, Check, ExternalLink, AlertTriangle, Paperclip, X } from 'lucide-react';
 
 export default function EmailClientModal({
@@ -13,6 +13,17 @@ export default function EmailClientModal({
   isJobApplication = false,
 }) {
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -33,7 +44,10 @@ export default function EmailClientModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overscroll-contain"
     >
       <div className="relative w-full max-w-2xl bg-[#121216] border border-[#D4AF37]/40 rounded-2xl shadow-2xl overflow-hidden text-gray-200">
         {/* Header bar */}
@@ -61,7 +75,7 @@ export default function EmailClientModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[78vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[78vh] overflow-y-auto overscroll-contain">
           {/* Important Resume Notice for Job Applications */}
           {isJobApplication && (
             <div className="p-3.5 sm:p-4 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/40 text-amber-100 flex gap-2.5 sm:gap-3 items-start">
