@@ -24,7 +24,7 @@ import {
   X,
   Camera
 } from 'lucide-react';
-import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
+import { BUSINESS_INFO, HOTSHOT_CAPABILITIES } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
 import EmailClientModal from '../components/EmailClientModal';
@@ -37,15 +37,16 @@ const iconMap = {
   Zap: Zap,
   MapPin: MapPin,
   Compass: Compass,
+  ShieldCheck: ShieldCheck,
 };
 
 export default function HomePage() {
-  // Lightbox Modal State for Fleet Images
-  const [lightboxImage, setLightboxImage] = useState(null);
+  // Modal State for Official Brand Flyer
+  const [showBrandModal, setShowBrandModal] = useState(false);
 
-  // Lock background scroll only when lightbox modal is open
+  // Lock background scroll only when modal is open
   useEffect(() => {
-    if (lightboxImage) {
+    if (showBrandModal) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -53,7 +54,7 @@ export default function HomePage() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [lightboxImage]);
+  }, [showBrandModal]);
 
   // Modal State for Email Client
   const [modalState, setModalState] = useState({
@@ -401,16 +402,25 @@ ${contactData.message.trim()}
                 {/* Full Logo Card */}
                 <div className="relative rounded-2xl bg-[#121216] border-2 border-[#D4AF37]/60 shadow-2xl p-3 sm:p-4">
                   {/* Image container displaying entire logo without any cropping */}
-                  <div className="relative rounded-xl overflow-hidden bg-black p-2 flex items-center justify-center">
+                  <div 
+                    onClick={() => setShowBrandModal(true)}
+                    className="relative rounded-xl overflow-hidden bg-black p-2 flex items-center justify-center cursor-pointer group"
+                    title="Click to view full official flyer"
+                  >
                     <img
                       src={BUSINESS_INFO.logoUrl}
                       alt="Brothers Hotshot Services Official Logo"
-                      className="w-full h-auto max-h-[300px] sm:max-h-[360px] object-contain block mx-auto"
+                      className="w-full h-auto max-h-[300px] sm:max-h-[360px] object-contain block mx-auto group-hover:scale-[1.01] transition-transform"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = BUSINESS_INFO.cloudinaryLogo;
                       }}
                     />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      <span className="p-1 rounded-full bg-black/80 text-[#D4AF37] border border-[#D4AF37]/50 flex items-center justify-center shadow">
+                        <Maximize2 className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
                   </div>
 
                   <div className="mt-2.5 sm:mt-3 pt-2.5 sm:pt-3 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs">
@@ -424,40 +434,37 @@ ${contactData.message.trim()}
                     </div>
                   </div>
 
-                  {/* Quick Fleet Thumbnail Preview Row */}
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-semibold text-gray-300 flex items-center gap-1.5">
-                        <Camera className="w-3.5 h-3.5 text-[#D4AF37]" />
-                        <span>Fleet in Action</span>
+                  {/* Hotshot Operations Highlights */}
+                  <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-semibold text-white flex items-center gap-1.5">
+                        <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        <span>Pickup & Gooseneck Fleet</span>
                       </span>
                       <a
                         href="#gallery"
                         className="text-[10px] text-[#D4AF37] hover:underline font-semibold"
                       >
-                        View Gallery →
+                        Capabilities →
                       </a>
                     </div>
-                    <div className="grid grid-cols-5 gap-1.5">
-                      {FLEET_IMAGES.map((img) => (
-                        <button
-                          key={img.id}
-                          type="button"
-                          onClick={() => setLightboxImage(img)}
-                          title={img.title}
-                          className="relative aspect-square rounded-lg overflow-hidden border border-white/15 hover:border-[#D4AF37] transition-all group/thumb focus:outline-none"
-                        >
-                          <img
-                            src={img.url}
-                            alt={img.title}
-                            className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = img.cloudinaryUrl;
-                            }}
-                          />
-                        </button>
-                      ))}
+                    <div className="grid grid-cols-2 gap-1.5 text-[10px] text-gray-300">
+                      <div className="p-2 rounded-lg bg-black/50 border border-white/5 flex items-center gap-1.5">
+                        <ShieldCheck className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                        <span>Equipment Hauling</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-black/50 border border-white/5 flex items-center gap-1.5">
+                        <Zap className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                        <span>Urgent Deliveries</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-black/50 border border-white/5 flex items-center gap-1.5">
+                        <Compass className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                        <span>Long-Distance Loads</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-black/50 border border-white/5 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                        <span>Point-to-Point Direct</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -670,90 +677,187 @@ ${contactData.message.trim()}
       </section>
 
       {/* ========================================================
-          4. FLEET & EQUIPMENT GALLERY SECTION (#gallery)
+          4. FLEET & EQUIPMENT CAPABILITIES SECTION (#gallery)
       ======================================================== */}
       <section id="gallery" className="py-16 sm:py-20 lg:py-24 border-b border-white/10 bg-[#0B0B0D] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 mb-12 sm:mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
+          <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Real Equipment & Operations
+              Hotshot Fleet & Capabilities
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-white tracking-tight">
-              Our Fleet & Capabilities in Action
+              Hotshot Trucks & Trailers Engineered for Expedited Freight
             </h2>
             <p className="text-gray-400 text-sm sm:text-base lg:text-lg">
-              Explore our heavy haulers, specialized trailers, industrial freight units, and interprovincial transport network across Western Canada.
+              Our dedicated hotshot operations utilize heavy-duty pickup trucks paired with 30'–40' gooseneck flatbed trailers. We specialize in fast, direct-point transport of machinery, equipment, urgent parts, and long-distance Western Canada loads—without terminal delays.
             </p>
           </div>
 
-          {/* Featured Fleet Grid */}
+          {/* Hotshot Equipment & Operations Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {FLEET_IMAGES.map((item, index) => (
-              <div
-                key={item.id}
-                onClick={() => setLightboxImage(item)}
-                className="group relative rounded-2xl bg-[#131317] border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-center items-center"
-              >
-                {/* Full Uncropped Image Container */}
-                <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
+            {HOTSHOT_CAPABILITIES.map((item, index) => {
+              const CapIcon = iconMap[item.icon] || Truck;
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-2xl bg-[#131317] border border-white/10 hover:border-[#D4AF37]/60 p-6 sm:p-7 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between space-y-5 group"
+                >
+                  <div className="space-y-4">
+                    {/* Badge and Icon header */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] sm:text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37]">
+                        {item.badge}
+                      </span>
+                      <div className="w-10 h-10 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center text-[#D4AF37] group-hover:border-[#D4AF37] group-hover:scale-105 transition-all shadow-inner">
+                        <CapIcon className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    {/* Title & Tagline */}
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#F5E6B3] transition-colors">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-[#D4AF37] font-semibold mt-1">
+                        {item.tagline}
+                      </p>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                      {item.description}
+                    </p>
+
+                    {/* Specifications List */}
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-[11px]">
+                      {item.specs.map((spec, sIdx) => (
+                        <div key={sIdx} className="p-2 rounded-lg bg-black/40 border border-white/5 space-y-0.5">
+                          <span className="text-gray-400 block text-[10px]">{spec.label}</span>
+                          <span className="text-white font-semibold leading-tight block">{spec.value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Operational Features */}
+                    <ul className="space-y-1.5 pt-1 text-xs text-gray-400">
+                      {item.features.slice(0, 3).map((feat, fIdx) => (
+                        <li key={fIdx} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0 mt-0.5" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+                    <a
+                      href="#quote"
+                      onClick={() => setQuoteData((prev) => ({ ...prev, loadType: item.title }))}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-gold-gradient text-white hover:text-[#0B0B0D] font-bold text-xs border border-white/10 hover:border-transparent transition-all min-h-[38px]"
+                    >
+                      <span>Quote This Setup</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                    <span className="text-xs text-gray-500 font-mono">0{index + 1}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Featured Transport Spotlight Banner */}
+          <div className="rounded-2xl bg-gradient-to-br from-[#1A1A22] via-[#141418] to-[#101014] border border-[#D4AF37]/50 p-6 sm:p-8 lg:p-10 shadow-2xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Left Column: Official Brand Artwork */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center">
+                <div 
+                  onClick={() => setShowBrandModal(true)}
+                  className="relative rounded-2xl bg-black p-3 border-2 border-[#D4AF37]/60 shadow-xl cursor-pointer group max-w-[320px] w-full"
+                  title="Click to view full official flyer"
+                >
                   <img
-                    src={item.url}
-                    alt={item.title}
-                    loading="lazy"
-                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                    src={BUSINESS_INFO.logoUrl}
+                    alt="Brothers Hotshot Services Official Setup"
+                    className="w-full h-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = item.cloudinaryUrl;
+                      e.target.src = BUSINESS_INFO.cloudinaryLogo;
                     }}
                   />
-
-                  {/* Subtle expand icon on hover */}
-                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <span className="w-8 h-8 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
-                      <Maximize2 className="w-4 h-4" />
+                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-gray-300">
+                    <span className="text-[#D4AF37] font-semibold flex items-center gap-1">
+                      <Truck className="w-3.5 h-3.5" />
+                      <span>Official Transport Setup</span>
+                    </span>
+                    <span className="text-[11px] text-gray-400 group-hover:text-white transition-colors flex items-center gap-1">
+                      <Maximize2 className="w-3 h-3" />
+                      <span>Expand Flyer</span>
                     </span>
                   </div>
                 </div>
               </div>
-            ))}
 
-            {/* 6th Card: Book Your Load Card with Call-Out */}
-            <div className="rounded-2xl bg-gradient-to-br from-[#1C1C24] via-[#141418] to-[#121216] border border-[#D4AF37]/60 p-6 flex flex-col justify-between space-y-5 shadow-xl">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#F5E6B3] text-[11px] font-semibold">
-                  <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>24/7 Availability</span>
-                </div>
-                <h3 className="text-2xl font-black text-white">
-                  Book Your Load Today!
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  Fast, safe, and dependable hotshot delivery throughout Alberta, Saskatchewan, British Columbia, and Manitoba (including Winnipeg).
-                </p>
-                <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1 text-xs text-gray-300">
-                  <p className="text-white font-semibold flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Every Load. Every Time.</span>
+              {/* Right Column: Hotshot Operating Standards & Direct Action */}
+              <div className="lg:col-span-7 space-y-5">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#F5E6B3] text-xs font-semibold">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>The Hotshot Advantage</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white">
+                    Direct Point-to-Point Transport Across Western Canada
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                    Unlike traditional freight carriers that shuffle cargo through sorting terminals and depots, Brothers Hotshot Services loads your shipment onto our dedicated pickup truck and trailer setup and drives directly to your destination.
                   </p>
-                  <p className="text-gray-400">Direct point-to-point transport for machines, parts, and materials.</p>
                 </div>
-              </div>
 
-              <div className="space-y-2.5 pt-2 border-t border-white/10">
-                <a
-                  href="#quote"
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm tracking-wide shadow-lg min-h-[44px]"
-                >
-                  <span>Request Instant Quote</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-                <a
-                  href={BUSINESS_INFO.phoneTel}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white font-bold text-xs hover:text-[#D4AF37] min-h-[40px]"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
-                </a>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs text-gray-300">
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                    <p className="font-bold text-white flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Zero Terminal Delays</span>
+                    </p>
+                    <p className="text-gray-400 text-[11px]">Your cargo stays on one dedicated trailer until delivered.</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                    <p className="font-bold text-white flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Central Red Deer Dispatch</span>
+                    </p>
+                    <p className="text-gray-400 text-[11px]">Rapid deployment along the QEII corridor to all provinces.</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                    <p className="font-bold text-white flex items-center gap-1.5">
+                      <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Agile Job Site Access</span>
+                    </p>
+                    <p className="text-gray-400 text-[11px]">Pickup trucks easily maneuver tight yards and field leases.</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                    <p className="font-bold text-white flex items-center gap-1.5">
+                      <Zap className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>24/7 Real-Time Tracking</span>
+                    </p>
+                    <p className="text-gray-400 text-[11px]">Direct communication with dispatch and drivers at every step.</p>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-3">
+                  <a
+                    href="#quote"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm tracking-wide shadow-lg hover:shadow-[#D4AF37]/30 transition-all min-h-[44px]"
+                  >
+                    <span>Request Instant Quote</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                  <a
+                    href={BUSINESS_INFO.phoneTel}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 border border-white/15 text-white hover:text-[#D4AF37] font-bold text-xs sm:text-sm min-h-[44px]"
+                  >
+                    <Phone className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -832,40 +936,52 @@ ${contactData.message.trim()}
               </div>
             ))}
 
-            {/* Visual Route Network Card (fleet-3) */}
-            <div 
-              onClick={() => setLightboxImage(FLEET_IMAGES[2])}
-              className="rounded-2xl bg-[#121216] border border-white/10 hover:border-[#D4AF37]/60 overflow-hidden shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer group"
-            >
-              <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
-                <img
-                  src="/images/fleet-3.jpg"
-                  alt="Connecting Western Canada Hotshot Network"
-                  className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = FLEET_IMAGES[2].cloudinaryUrl;
-                  }}
-                />
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <span className="w-8 h-8 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
-                    <Maximize2 className="w-4 h-4" />
+            {/* Interprovincial Logistics Corridors Card */}
+            <div className="rounded-2xl bg-[#121216] border border-white/10 hover:border-[#D4AF37]/60 p-6 sm:p-7 shadow-xl transition-all duration-300 flex flex-col justify-between space-y-5 group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] flex items-center gap-1.5">
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>Western Canada Network</span>
                   </span>
+                  <span className="text-xs font-bold text-gray-400">4 Provinces</span>
                 </div>
-              </div>
-              <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
+
                 <div>
-                  <h4 className="text-lg font-bold text-white group-hover:text-[#F5E6B3] transition-colors">
-                    Connecting Western Canada
+                  <h4 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#F5E6B3] transition-colors">
+                    Interprovincial Hotshot Corridors
                   </h4>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Direct freight routes between Alberta, Saskatchewan, British Columbia, and Manitoba including Winnipeg.
+                  <p className="text-xs text-[#D4AF37] font-semibold mt-1">
+                    Direct Highway Transit Linking AB, BC, SK & MB
                   </p>
                 </div>
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-[#D4AF37] font-semibold">
-                  <span>View network map</span>
-                  <Maximize2 className="w-3.5 h-3.5" />
+
+                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
+                  Our hotshot pickup trucks and trailers run non-stop across Western Canadian highway systems to ensure your critical loads and machinery arrive safely on schedule without depot delays.
+                </p>
+
+                <div className="p-3.5 rounded-xl bg-black/50 border border-white/5 space-y-2 text-xs">
+                  <p className="text-white font-semibold flex items-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>Key Transit Routes:</span>
+                  </p>
+                  <ul className="space-y-1 text-gray-400 text-[11px]">
+                    <li>• Trans-Canada Hwy 1 (Vancouver • Calgary • Regina • Winnipeg)</li>
+                    <li>• Yellowhead Hwy 16 (Edmonton • Lloydminster • Saskatoon)</li>
+                    <li>• QEII Hwy 2 (Edmonton • Red Deer • Calgary Corridor)</li>
+                  </ul>
                 </div>
+              </div>
+
+              <div className="pt-4 border-t border-white/10">
+                <a
+                  href="#quote"
+                  onClick={() => setQuoteData((prev) => ({ ...prev, loadType: 'Long-Distance Transportation' }))}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-gold-gradient text-white hover:text-[#0B0B0D] font-bold text-xs border border-white/10 hover:border-transparent transition-all min-h-[40px]"
+                >
+                  <span>Request Interprovincial Quote</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
               </div>
             </div>
 
@@ -1525,29 +1641,30 @@ ${contactData.message.trim()}
         isJobApplication={modalState.isJobApplication}
       />
 
-      {/* Fleet Image Fullscreen Lightbox Modal */}
-      {lightboxImage && (
+      {/* Official Brothers Hotshot Flyer Modal */}
+      {showBrandModal && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-labelledby="lightbox-title"
+          aria-labelledby="flyer-modal-title"
           onClick={(e) => {
-            if (e.target === e.currentTarget) setLightboxImage(null);
+            if (e.target === e.currentTarget) setShowBrandModal(false);
           }}
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/90 backdrop-blur-md animate-fadeIn overscroll-contain"
         >
-          <div className="relative w-full max-w-4xl max-h-[95vh] bg-[#121216] border border-[#D4AF37]/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col overscroll-contain">
+          <div className="relative w-full max-w-3xl max-h-[95vh] bg-[#121216] border border-[#D4AF37]/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col overscroll-contain">
             {/* Top Bar */}
             <div className="px-4 sm:px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#17171C]">
               <div className="min-w-0 flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
-                <h3 id="lightbox-title" className="text-white text-xs sm:text-sm font-bold tracking-wide">
-                  Brothers Hotshot Services • Fleet & Equipment
+                <h3 id="flyer-modal-title" className="text-white text-xs sm:text-sm font-bold tracking-wide truncate">
+                  Brothers Hotshot Services • Official Transport Flyer
                 </h3>
               </div>
               <button
-                onClick={() => setLightboxImage(null)}
-                aria-label="Close photo preview"
+                type="button"
+                onClick={() => setShowBrandModal(false)}
+                aria-label="Close flyer preview"
                 className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 ml-2"
               >
                 <X className="w-5 h-5 text-gray-300" />
@@ -1555,52 +1672,22 @@ ${contactData.message.trim()}
             </div>
 
             {/* Main Image Preview Area */}
-            <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden p-2 sm:p-4 min-h-[300px]">
+            <div className="relative flex-1 bg-black flex items-center justify-center overflow-auto p-2 sm:p-4 min-h-[300px]">
               <img
-                src={lightboxImage.url}
-                alt={lightboxImage.title}
-                className="max-h-[78vh] max-w-full object-contain mx-auto rounded-lg shadow-2xl select-none"
+                src={BUSINESS_INFO.logoUrl}
+                alt="Brothers Hotshot Services Official Flyer"
+                className="max-h-[75vh] max-w-full object-contain mx-auto rounded-lg shadow-2xl select-none"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = lightboxImage.cloudinaryUrl;
+                  e.target.src = BUSINESS_INFO.cloudinaryLogo;
                 }}
               />
-
-              {/* Prev Button */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const currIdx = FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id);
-                  const prevIdx = (currIdx - 1 + FLEET_IMAGES.length) % FLEET_IMAGES.length;
-                  setLightboxImage(FLEET_IMAGES[prevIdx]);
-                }}
-                aria-label="Previous photo"
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 hover:border-[#D4AF37] text-white transition-all cursor-pointer shadow-lg active:scale-95"
-              >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-
-              {/* Next Button */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const currIdx = FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id);
-                  const nextIdx = (currIdx + 1) % FLEET_IMAGES.length;
-                  setLightboxImage(FLEET_IMAGES[nextIdx]);
-                }}
-                aria-label="Next photo"
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 hover:border-[#D4AF37] text-white transition-all cursor-pointer shadow-lg active:scale-95"
-              >
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
             </div>
 
             {/* Bottom Bar Details & CTAs */}
-            <div className="p-3 sm:p-4 bg-[#17171C] border-t border-white/10 flex items-center justify-between gap-3 text-xs sm:text-sm">
-              <span className="text-xs text-gray-400 hidden sm:inline">
-                Click arrows to browse photos
+            <div className="p-3 sm:p-4 bg-[#17171C] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+              <span className="text-xs text-gray-400">
+                Hotshot pickup & trailer transport across Western Canada
               </span>
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <a
@@ -1612,7 +1699,7 @@ ${contactData.message.trim()}
                 </a>
                 <a
                   href="#quote"
-                  onClick={() => setLightboxImage(null)}
+                  onClick={() => setShowBrandModal(false)}
                   className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-gradient text-[#0B0B0D] text-xs font-extrabold shadow-md min-h-[38px]"
                 >
                   <span>Get Quote</span>

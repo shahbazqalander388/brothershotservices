@@ -38,60 +38,141 @@ export const BUSINESS_INFO = {
     "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539190/WhatsApp_Image_2026-10-09_at_5.33.01_AM_kldvsw.jpg",
 };
 
-export const FLEET_IMAGES = [
+export const HOTSHOT_CAPABILITIES = [
   {
-    id: "fleet-1",
-    title: "Kenworth Commercial Heavy Hauler & Rig",
-    category: "Commercial Transport",
-    badge: "Fast • Safe • Reliable",
+    id: "pickup-trailers",
+    title: "Hotshot Trucks & Gooseneck Trailers",
+    category: "Primary Fleet Setup",
+    badge: "Agile & Expedited",
+    icon: "Truck",
+    tagline: "Heavy-Duty Pickups with 30'–40' Gooseneck Decks",
     description:
-      "Full-scale equipment transport and hotshot delivery connecting British Columbia, Alberta, Saskatchewan, and Manitoba (including Winnipeg).",
-    url: "/images/fleet-1.jpg",
-    cloudinaryUrl:
-      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539193/WhatsApp_Image_2026-10-09_at_11.18.03_AM_l7izoy.jpg",
+      "Our main transport setup utilizes heavy-duty dually pickup trucks paired with versatile gooseneck flatbed trailers, providing rapid mobilization, exceptional highway stability, and direct point-to-point delivery without freight transfers.",
+    specs: [
+      { label: "Configuration", value: "Heavy-Duty Dually Pickups" },
+      { label: "Trailer Setup", value: "30'–40' Gooseneck Flatbeds" },
+      { label: "Dispatch", value: "Dedicated Direct Routing (No Cross-Docking)" },
+      { label: "Transit Mode", value: "Expedited Point-to-Point Transit" },
+    ],
+    features: [
+      "Rapid dispatch mobilization from our central Red Deer, AB operational hub",
+      "Agile access into tight job sites, commercial yards, rural locations, and plant leases",
+      "Continuous journey monitoring and direct proactive dispatch updates",
+      "Dedicated carrier handling—your freight stays on our trailer from pickup to drop-off",
+    ],
   },
   {
-    id: "fleet-2",
-    title: "Heavy Equipment Hauling & Lowboy Transport",
-    category: "Heavy Machinery",
-    badge: "24/7 Availability",
+    id: "equipment-hauling",
+    title: "Equipment & Machinery Hauling",
+    category: "Machinery Transport",
+    badge: "Drive-On & Crane Loading",
+    icon: "Wrench",
+    tagline: "Safe Transport for Construction, Ag & Industrial Units",
     description:
-      "Committed to getting your excavators, heavy construction units, and industrial machinery where they need to go, safely and on time.",
-    url: "/images/fleet-2.jpg",
-    cloudinaryUrl:
-      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539194/WhatsApp_Image_2026-10-09_at_11.18.06_AM_tbzioh.jpg",
+      "Engineered for moving skid steers, mini-excavators, attachments, agricultural equipment, compressors, generators, and industrial tools with safe weight distribution and high-strength anchoring.",
+    specs: [
+      { label: "Loading", value: "Heavy-duty full-width drive-on ramps" },
+      { label: "Securement", value: "Grade-70 transport chains & ratchet binders" },
+      { label: "Typical Units", value: "Skid steers, attachments, compact machinery" },
+      { label: "Handling", value: "Experienced load balancing & axle compliance" },
+    ],
+    features: [
+      "Low-angle beavertail ramps allowing safe drive-on and drive-off operations",
+      "Multi-point tie-down perimeter with heavy D-rings and certified stake pockets",
+      "Direct site-to-site transport between construction yards, lease sites, and shops",
+      "Strict compliance with provincial axle limits and Canadian highway transport rules",
+    ],
   },
   {
-    id: "fleet-3",
-    title: "Western Canadian Interprovincial Freight Corridors",
-    category: "Prairie & Interprovincial",
-    badge: "BC • AB • SK • MB",
+    id: "urgent-deliveries",
+    title: "Urgent & Emergency Deliveries",
+    category: "Time-Critical Freight",
+    badge: "24/7 Priority Dispatch",
+    icon: "Zap",
+    tagline: "Immediate Response When Every Hour Counts",
     description:
-      "Strategic logistics map and dedicated fleet linking Alberta, Saskatchewan, British Columbia, and Manitoba with expedited dispatch.",
-    url: "/images/fleet-3.jpg",
-    cloudinaryUrl:
-      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539191/WhatsApp_Image_2026-10-09_at_11.18.04_AM_joenlk.jpg",
+      "Dedicated hotshot dispatch designed for emergency plant shutdowns, drilling rig breakdowns, replacement mechanical parts, and deadline-critical industrial freight requiring immediate non-stop transit.",
+    specs: [
+      { label: "Mobilization", value: "Immediate driver dispatch response" },
+      { label: "Routing", value: "Non-stop dedicated direct transport" },
+      { label: "Availability", value: "24/7 dispatch coordination" },
+      { label: "Updates", value: "Direct driver communication & ETA alerts" },
+    ],
+    features: [
+      "Single-carrier direct transport without co-loading or cross-dock delays",
+      "Fast replacement parts delivery to curtail costly operational downtime",
+      "Transparent communication with dispatchers and drivers from start to finish",
+      "Direct handoff to designated site foreman, receiver, or project superintendent",
+    ],
   },
   {
-    id: "fleet-4",
-    title: "Expedited Highway Freight & Rapid Transit",
-    category: "Urgent Hotshot",
-    badge: "Rapid Highway Dispatch",
+    id: "long-distance",
+    title: "Long-Distance Western Canada Corridors",
+    category: "Interprovincial Routes",
+    badge: "AB • BC • SK • MB",
+    icon: "Compass",
+    tagline: "Interprovincial Hotshot Connecting 4 Western Provinces",
     description:
-      "Time-sensitive point-to-point transport running non-stop to deliver emergency replacement parts and high-priority industrial freight.",
-    url: "/images/fleet-4.jpg",
-    cloudinaryUrl:
-      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539191/WhatsApp_Image_2026-10-09_at_11.18.07_AM_c6vpty.jpg",
+      "Proven long-haul transportation connecting Alberta, Saskatchewan, British Columbia, and Manitoba (including Winnipeg). We navigate cross-provincial corridors, mountain passes, and prairie highways safely in all seasons.",
+    specs: [
+      { label: "Coverage", value: "Alberta, BC, Saskatchewan, Manitoba" },
+      { label: "Key Corridors", value: "Hwy 1, Yellowhead Hwy 16, QEII Hwy 2" },
+      { label: "Destination Reach", value: "Winnipeg, Vancouver, Calgary, Edmonton & beyond" },
+      { label: "Safety Standard", value: "National Safety Code (NSC) compliant" },
+    ],
+    features: [
+      "Centrally dispatched from Red Deer midway between Edmonton and Calgary",
+      "Experienced drivers trained for prairie highways and seasonal Canadian conditions",
+      "Complete adherence to interprovincial commercial regulations and permitting",
+      "Punctual delivery schedules tailored to your receiving facility hours",
+    ],
   },
   {
-    id: "fleet-5",
-    title: "Industrial Materials, Parts & Heavy Machinery Cargo",
-    category: "Specialized Loads",
-    badge: "Certified Rigging & Tarping",
+    id: "materials-parts",
+    title: "Industrial Materials & Critical Cargo",
+    category: "Commercial Hauling",
+    badge: "Versatile Deck Capacity",
+    icon: "Layers",
+    tagline: "Fabricated Steel, Pipe Bundles & Crated Supplies",
     description:
-      "Safe, dependable transport for structural steel pipes, industrial gearboxes, construction machinery, and hotshot flatbed cargo.",
-    url: "/images/fleet-5.jpg",
-    cloudinaryUrl:
-      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539190/WhatsApp_Image_2026-10-09_at_11.18.03_AM_1_i32q1g.jpg",
+      "Safe, dependable hauling for structural materials, piping bundles, machined parts, electrical panels, industrial valves, and crated goods requiring professional tie-downs and weather protection.",
+    specs: [
+      { label: "Deck Access", value: "Open flatdeck for forklift & crane loading" },
+      { label: "Tie-Downs", value: "Heavy-duty 4-inch straps & corner protectors" },
+      { label: "Weather Tarps", value: "Fitted heavy-duty tarps available upon request" },
+      { label: "Cargo Integrity", value: "Certified blocking and dunnage securement" },
+    ],
+    features: [
+      "Full 360-degree flatdeck accessibility for crane and forklift loading",
+      "Pipe stakes and certified blocking for round tubulars and steel bundles",
+      "Heavy-duty tarping to protect sensitive materials against road grime and salt",
+      "Careful staging and balance inspection prior to highway departure",
+    ],
+  },
+  {
+    id: "securement-safety",
+    title: "Certified Securement & Safety Standards",
+    category: "Safety & Compliance",
+    badge: "100% NSC Compliant",
+    icon: "ShieldCheck",
+    tagline: "Rigorous Rigging, Ratchet Binders & Weather Tarping",
+    description:
+      "Every load is secured with professional-grade transport equipment in full compliance with Canadian Cargo Securement Standards, ensuring your freight arrives securely and without damage.",
+    specs: [
+      { label: "Chains", value: "Grade-70 transport chain & ratchet binders" },
+      { label: "Straps", value: "High-tensile 4-inch polyester ratchet tie-downs" },
+      { label: "Protection", value: "Heavy corner guards & weather-resistant tarps" },
+      { label: "Inspection", value: "Routine pre-trip & en-route load check protocols" },
+    ],
+    features: [
+      "Strict compliance with National Safety Code Standard 10 (Cargo Securement)",
+      "Engineered weight distribution preventing cargo shifts and axle overload",
+      "Corner protectors applied to prevent strap abrasion and protect finished goods",
+      "Safety-first operating philosophy focused on dependable, on-time delivery",
+    ],
   },
 ];
+
+// Backward-compatible alias for any legacy imports
+export const FLEET_IMAGES = [];
+
