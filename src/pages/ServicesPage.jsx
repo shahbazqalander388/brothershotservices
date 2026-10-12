@@ -149,88 +149,39 @@ export default function ServicesPage() {
             })}
           </div>
 
-          {/* Equipment & Transport Specifications */}
+          {/* Visual Transport Graphics Gallery */}
           <div className="pt-10 border-t border-white/10 space-y-8">
             <div className="text-center max-w-2xl mx-auto space-y-2">
-              <span className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">Fleet & Equipment Standards</span>
-              <h3 className="text-2xl sm:text-3xl font-black text-white">Hotshot Pickup & Trailer Configurations</h3>
+              <span className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">Official Transport Gallery</span>
+              <h3 className="text-2xl sm:text-3xl font-black text-white">Brothers Hotshot Transport Corridors</h3>
               <p className="text-xs sm:text-sm text-gray-400">
-                Heavy-duty pickup trucks paired with 30'–40' gooseneck flatbed trailers tailored for fast, direct freight transport across Western Canada.
+                Official flyers and transport graphics across Western Canada. Click any image to view in full resolution.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {HOTSHOT_CAPABILITIES.slice(0, 3).map((item) => {
-                const CapIcon = iconMap[item.icon] || Truck;
-                return (
-                  <div
-                    key={item.id}
-                    className="p-6 rounded-2xl bg-[#14141A] border border-white/10 hover:border-[#D4AF37]/50 shadow-xl transition-all space-y-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30">
-                        {item.badge}
-                      </span>
-                      <CapIcon className="w-5 h-5 text-[#D4AF37]" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold text-white">{item.title}</h4>
-                      <p className="text-xs text-[#D4AF37] mt-0.5">{item.tagline}</p>
-                    </div>
-                    <p className="text-xs text-gray-400 leading-relaxed">{item.description}</p>
-                    <div className="pt-2 border-t border-white/10 space-y-1 text-[11px] text-gray-300">
-                      {item.specs.map((s, idx) => (
-                        <div key={idx} className="flex justify-between">
-                          <span className="text-gray-400">{s.label}:</span>
-                          <span className="font-medium text-white">{s.value}</span>
-                        </div>
-                      ))}
-                    </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              {FLEET_IMAGES.map((img) => (
+                <div
+                  key={img.id}
+                  onClick={() => setSelectedImage(img)}
+                  className="group relative rounded-xl bg-black border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-xl transition-all cursor-pointer aspect-square flex items-center justify-center p-1.5"
+                >
+                  <img
+                    src={img.url}
+                    alt={img.title}
+                    className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = img.cloudinaryUrl;
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <span className="p-2 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] text-[#D4AF37] flex items-center justify-center shadow-lg">
+                      <Maximize2 className="w-4 h-4" />
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Visual Fleet Flyers Showcase */}
-            <div className="pt-10 border-t border-white/10 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-                <div>
-                  <span className="text-xs font-mono uppercase tracking-wider text-[#D4AF37]">Visual Equipment Showcase</span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Brothers Hotshot Transport Corridors</h3>
                 </div>
-                <p className="text-xs text-gray-400">Click any image to view high-resolution flyer</p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-                {FLEET_IMAGES.map((img) => (
-                  <div
-                    key={img.id}
-                    onClick={() => setSelectedImage(img)}
-                    className="group relative rounded-xl bg-[#14141A] border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-lg transition-all cursor-pointer flex flex-col"
-                  >
-                    <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
-                      <img
-                        src={img.url}
-                        alt={img.title}
-                        className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = img.cloudinaryUrl;
-                        }}
-                      />
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                        <span className="p-1 rounded-full bg-black/70 text-[#D4AF37] flex items-center justify-center shadow">
-                          <Maximize2 className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-2.5 bg-[#17171E] border-t border-white/5 space-y-0.5">
-                      <span className="text-[9px] font-mono text-[#D4AF37] uppercase block truncate">{img.badge}</span>
-                      <p className="text-white text-xs font-semibold truncate">{img.title}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
 

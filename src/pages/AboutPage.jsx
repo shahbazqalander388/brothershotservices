@@ -158,116 +158,44 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Hotshot Equipment & Operations Showcase */}
+      {/* Official Marketing Gallery */}
       <section className="py-14 sm:py-20 border-t border-white/10 bg-[#0E0E12]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Hotshot Equipment & Capabilities
+              Official Transport Gallery
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white">
-              Our Equipment & Transport Fleet
+              Brothers Hotshot Transport Graphics
             </h2>
             <p className="text-gray-400 text-sm sm:text-base">
-              Dedicated pickup trucks with 30'–40' gooseneck flatbed trailers delivering machinery, urgent loads, and long-distance freight across Western Canada.
+              Official marketing flyers and service transport graphics across Alberta, BC, Saskatchewan, and Manitoba. Click any image to view in full resolution.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {HOTSHOT_CAPABILITIES.map((cap, index) => {
-              const CapIcon = iconMap[cap.icon] || Truck;
-              return (
-                <div
-                  key={cap.id}
-                  className="rounded-2xl bg-[#14141A] border border-white/10 hover:border-[#D4AF37]/60 p-6 shadow-xl transition-all duration-300 flex flex-col justify-between space-y-4 group"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] sm:text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37]">
-                        {cap.badge}
-                      </span>
-                      <div className="w-9 h-9 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center text-[#D4AF37] group-hover:border-[#D4AF37] transition-colors">
-                        <CapIcon className="w-4 h-4" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-[#F5E6B3] transition-colors">
-                        {cap.title}
-                      </h3>
-                      <p className="text-xs text-[#D4AF37] font-semibold mt-0.5">
-                        {cap.tagline}
-                      </p>
-                    </div>
-
-                    <p className="text-xs text-gray-400 leading-relaxed">
-                      {cap.description}
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-white/10 text-[10px]">
-                      {cap.specs.slice(0, 2).map((s, i) => (
-                        <div key={i} className="p-2 rounded-lg bg-black/40 border border-white/5">
-                          <span className="text-gray-400 block">{s.label}</span>
-                          <span className="text-white font-medium block truncate">{s.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                    <Link
-                      to="/quote"
-                      className="inline-flex items-center gap-1.5 text-xs text-[#D4AF37] hover:text-white font-bold transition-colors"
-                    >
-                      <span>Request Transport</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                    <span className="text-xs text-gray-500 font-mono">0{index + 1}</span>
-                  </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            {FLEET_IMAGES.map((img) => (
+              <div
+                key={img.id}
+                onClick={() => setSelectedImage(img)}
+                className="group relative rounded-xl bg-black border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-xl transition-all cursor-pointer aspect-square flex items-center justify-center p-1.5"
+              >
+                <img
+                  src={img.url}
+                  alt={img.title}
+                  className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = img.cloudinaryUrl;
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span className="p-2 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] text-[#D4AF37] flex items-center justify-center shadow-lg">
+                    <Maximize2 className="w-4 h-4" />
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-          {/* Visual Fleet Flyers Grid */}
-          <div className="pt-12 border-t border-white/10 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-[#D4AF37]">Official Marketing Graphics</span>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Brothers Hotshot Transport Corridors</h3>
               </div>
-              <p className="text-xs text-gray-400">Click any image to view full flyer</p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-              {FLEET_IMAGES.map((img) => (
-                <div
-                  key={img.id}
-                  onClick={() => setSelectedImage(img)}
-                  className="group relative rounded-xl bg-[#14141A] border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-lg transition-all cursor-pointer flex flex-col"
-                >
-                  <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
-                    <img
-                      src={img.url}
-                      alt={img.title}
-                      className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = img.cloudinaryUrl;
-                      }}
-                    />
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      <span className="p-1 rounded-full bg-black/70 text-[#D4AF37] flex items-center justify-center shadow">
-                        <Maximize2 className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-2.5 bg-[#17171E] border-t border-white/5 space-y-0.5">
-                    <span className="text-[9px] font-mono text-[#D4AF37] uppercase block truncate">{img.badge}</span>
-                    <p className="text-white text-xs font-semibold truncate">{img.title}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
