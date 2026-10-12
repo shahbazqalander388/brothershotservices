@@ -173,6 +173,62 @@ export const HOTSHOT_CAPABILITIES = [
   },
 ];
 
-// Backward-compatible alias for any legacy imports
-export const FLEET_IMAGES = [];
+// Official Fleet & Marketing Graphics
+export const FLEET_IMAGES = [
+  {
+    id: "fleet-1",
+    title: "Connecting Western Canada • Highway Freight",
+    category: "Western Canada Transit",
+    badge: "Fast • Safe • Reliable",
+    description:
+      "Dedicated hotshot transportation connecting British Columbia, Alberta, Saskatchewan, and Manitoba (including Winnipeg) through major transport corridors.",
+    url: "/images/fleet-1.jpg",
+    cloudinaryUrl:
+      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791800460/WhatsApp_Image_2026-10-12_at_12.47.56_PM_odxwvw.jpg",
+  },
+  {
+    id: "fleet-2",
+    title: "Reliable Transportation Every Load. Every Time",
+    category: "Heavy Machinery & Equipment",
+    badge: "24/7 Availability",
+    description:
+      "Heavy-duty dually pickup and gooseneck trailer setup transporting skid steers, heavy machinery, and urgent equipment with safe securement.",
+    url: "/images/fleet-2.jpg",
+    cloudinaryUrl:
+      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791800459/WhatsApp_Image_2026-10-12_at_12.50.28_PM_m3gdhc.jpg",
+  },
+  {
+    id: "fleet-3",
+    title: "Interprovincial Routes & Western Coverage",
+    category: "Prairie & Mountain Corridors",
+    badge: "BC • AB • SK • MB",
+    description:
+      "Direct point-to-point service connecting Alberta, British Columbia, Saskatchewan, and Manitoba, including Winnipeg, with branded hotshot units.",
+    url: "/images/fleet-3.jpg",
+    cloudinaryUrl:
+      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791800458/WhatsApp_Image_2026-10-12_at_12.50.28_PM_1_mutyqf.jpg",
+  },
+  {
+    id: "fleet-4",
+    title: "Equipment Transportation & Hotshot Delivery",
+    category: "Expedited Hotshot",
+    badge: "Small Loads • Big Commitment",
+    description:
+      "Local and long-distance urgent freight and equipment transport dispatched rapidly with dedicated single-carrier handling.",
+    url: "/images/fleet-4.jpg",
+    cloudinaryUrl:
+      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791800452/WhatsApp_Image_2026-10-12_at_12.50.29_PM_tyu316.jpg",
+  },
+  {
+    id: "fleet-5",
+    title: "Business-to-Business Transportation",
+    category: "Commercial Cargo",
+    badge: "24/7 Dispatch Service",
+    description:
+      "Full commercial capability for construction materials, ATVs, crated boxes & freight, pallets, and industrial cargo on flatdeck gooseneck trailers.",
+    url: "/images/fleet-5.jpg",
+    cloudinaryUrl:
+      "https://res.cloudinary.com/dai2g47e4/image/upload/v1791800449/WhatsApp_Image_2026-10-12_at_12.47.16_PM_uavhpl.jpg",
+  },
+];
 

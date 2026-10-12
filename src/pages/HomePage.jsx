@@ -24,7 +24,7 @@ import {
   X,
   Camera
 } from 'lucide-react';
-import { BUSINESS_INFO, HOTSHOT_CAPABILITIES } from '../data/businessInfo';
+import { BUSINESS_INFO, HOTSHOT_CAPABILITIES, FLEET_IMAGES } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
 import EmailClientModal from '../components/EmailClientModal';
@@ -43,10 +43,12 @@ const iconMap = {
 export default function HomePage() {
   // Modal State for Official Brand Flyer
   const [showBrandModal, setShowBrandModal] = useState(false);
+  // Modal State for Fleet & Marketing Graphics Lightbox
+  const [lightboxImage, setLightboxImage] = useState(null);
 
-  // Lock background scroll only when modal is open
+  // Lock background scroll when either modal is open
   useEffect(() => {
-    if (showBrandModal) {
+    if (showBrandModal || lightboxImage) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -54,7 +56,7 @@ export default function HomePage() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showBrandModal]);
+  }, [showBrandModal, lightboxImage]);
 
   // Modal State for Email Client
   const [modalState, setModalState] = useState({
@@ -445,8 +447,31 @@ ${contactData.message.trim()}
                         href="#gallery"
                         className="text-[10px] text-[#D4AF37] hover:underline font-semibold"
                       >
-                        Capabilities →
+                        View All (5) →
                       </a>
+                    </div>
+
+                    {/* Fleet Flyer Thumbnails */}
+                    <div className="grid grid-cols-5 gap-1.5 pt-0.5">
+                      {FLEET_IMAGES.map((img) => (
+                        <button
+                          key={img.id}
+                          type="button"
+                          onClick={() => setLightboxImage(img)}
+                          title={img.title}
+                          className="relative aspect-square rounded-lg overflow-hidden border border-white/15 hover:border-[#D4AF37] transition-all group/thumb focus:outline-none bg-black cursor-pointer shadow-sm"
+                        >
+                          <img
+                            src={img.url}
+                            alt={img.title}
+                            className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = img.cloudinaryUrl;
+                            }}
+                          />
+                        </button>
+                      ))}
                     </div>
                     <div className="grid grid-cols-2 gap-1.5 text-[10px] text-gray-300">
                       <div className="p-2 rounded-lg bg-black/50 border border-white/5 flex items-center gap-1.5">
@@ -691,6 +716,74 @@ ${contactData.message.trim()}
             <p className="text-gray-400 text-sm sm:text-base lg:text-lg">
               Our dedicated hotshot operations utilize heavy-duty pickup trucks paired with 30'–40' gooseneck flatbed trailers. We specialize in fast, direct-point transport of machinery, equipment, urgent parts, and long-distance Western Canada loads—without terminal delays.
             </p>
+          </div>
+
+          {/* Visual Fleet Flyers Grid */}
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-3 border-b border-white/10">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-wider text-[#D4AF37]">Visual Equipment Showcase</span>
+                <h3 className="text-xl sm:text-2xl font-black text-white mt-0.5">Official Transport Fleet & Corridors</h3>
+              </div>
+              <p className="text-xs text-gray-400">Click any flyer to expand in high-resolution</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {FLEET_IMAGES.map((item, index) => (
+                <div
+                  key={item.id}
+                  onClick={() => setLightboxImage(item)}
+                  className="group relative rounded-2xl bg-[#131317] border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col justify-between"
+                >
+                  {/* Full Uncropped Square Image Container */}
+                  <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
+                    <img
+                      src={item.url}
+                      alt={item.title}
+                      loading="lazy"
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = item.cloudinaryUrl;
+                      }}
+                    />
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      <span className="w-8 h-8 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
+                        <Maximize2 className="w-4 h-4" />
+                      </span>
+                    </div>
+                    <div className="absolute bottom-3 left-3">
+                      <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full bg-black/85 backdrop-blur-md border border-[#D4AF37]/50 text-[#F5E6B3] shadow-md">
+                        {item.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-mono text-[#D4AF37] uppercase tracking-wider block">
+                        {item.category}
+                      </span>
+                      <h4 className="text-base sm:text-lg font-bold text-white group-hover:text-[#F5E6B3] transition-colors leading-snug">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                      <span className="text-[#D4AF37] font-semibold flex items-center gap-1 group-hover:underline">
+                        <span>Expand Flyer</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                      <span className="text-gray-500 font-mono text-[11px]">0{index + 1} / 05</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Hotshot Equipment & Operations Grid */}
@@ -1703,6 +1796,114 @@ ${contactData.message.trim()}
                   className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-gradient text-[#0B0B0D] text-xs font-extrabold shadow-md min-h-[38px]"
                 >
                   <span>Get Quote</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fleet Image Fullscreen Lightbox Modal */}
+      {lightboxImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lightbox-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setLightboxImage(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/90 backdrop-blur-md animate-fadeIn overscroll-contain"
+        >
+          <div className="relative w-full max-w-4xl max-h-[95vh] bg-[#121216] border border-[#D4AF37]/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col overscroll-contain">
+            {/* Top Bar */}
+            <div className="px-4 sm:px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#17171C]">
+              <div className="min-w-0 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
+                <h3 id="lightbox-title" className="text-white text-xs sm:text-sm font-bold tracking-wide truncate">
+                  {lightboxImage.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightboxImage(null)}
+                aria-label="Close photo preview"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 ml-2"
+              >
+                <X className="w-5 h-5 text-gray-300" />
+              </button>
+            </div>
+
+            {/* Main Image Preview Area */}
+            <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden p-2 sm:p-4 min-h-[300px]">
+              <img
+                src={lightboxImage.url}
+                alt={lightboxImage.title}
+                className="max-h-[75vh] max-w-full object-contain mx-auto rounded-lg shadow-2xl select-none"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = lightboxImage.cloudinaryUrl;
+                }}
+              />
+
+              {/* Prev Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currIdx = FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id);
+                  const prevIdx = (currIdx - 1 + FLEET_IMAGES.length) % FLEET_IMAGES.length;
+                  setLightboxImage(FLEET_IMAGES[prevIdx]);
+                }}
+                aria-label="Previous photo"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 hover:border-[#D4AF37] text-white transition-all cursor-pointer shadow-lg active:scale-95"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currIdx = FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id);
+                  const nextIdx = (currIdx + 1) % FLEET_IMAGES.length;
+                  setLightboxImage(FLEET_IMAGES[nextIdx]);
+                }}
+                aria-label="Next photo"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 hover:border-[#D4AF37] text-white transition-all cursor-pointer shadow-lg active:scale-95"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            {/* Bottom Bar Details & CTAs */}
+            <div className="p-3 sm:p-4 bg-[#17171C] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30">
+                  {lightboxImage.badge}
+                </span>
+                <span className="text-xs text-gray-400">
+                  {FLEET_IMAGES.findIndex((f) => f.id === lightboxImage.id) + 1} of {FLEET_IMAGES.length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <a
+                  href={BUSINESS_INFO.phoneTel}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-white hover:text-[#D4AF37] text-xs font-semibold min-h-[38px]"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Call: {BUSINESS_INFO.phone}</span>
+                </a>
+                <a
+                  href="#quote"
+                  onClick={() => {
+                    setQuoteData((prev) => ({ ...prev, loadType: lightboxImage.title }));
+                    setLightboxImage(null);
+                  }}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-gradient text-[#0B0B0D] text-xs font-extrabold shadow-md min-h-[38px]"
+                >
+                  <span>Quote This Setup</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>

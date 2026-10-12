@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -11,9 +11,13 @@ import {
   Wrench,
   Zap,
   Compass,
-  Layers
+  Layers,
+  Maximize2,
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import { BUSINESS_INFO, HOTSHOT_CAPABILITIES } from '../data/businessInfo';
+import { BUSINESS_INFO, HOTSHOT_CAPABILITIES, FLEET_IMAGES } from '../data/businessInfo';
 
 const iconMap = {
   Truck: Truck,
@@ -25,6 +29,18 @@ const iconMap = {
 };
 
 export default function AboutPage() {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  useEffect(() => {
+    if (selectedImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedImage]);
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200">
@@ -212,6 +228,47 @@ export default function AboutPage() {
               );
             })}
           </div>
+          {/* Visual Fleet Flyers Grid */}
+          <div className="pt-12 border-t border-white/10 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-wider text-[#D4AF37]">Official Marketing Graphics</span>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mt-0.5">Brothers Hotshot Transport Corridors</h3>
+              </div>
+              <p className="text-xs text-gray-400">Click any image to view full flyer</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+              {FLEET_IMAGES.map((img) => (
+                <div
+                  key={img.id}
+                  onClick={() => setSelectedImage(img)}
+                  className="group relative rounded-xl bg-[#14141A] border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-lg transition-all cursor-pointer flex flex-col"
+                >
+                  <div className="relative aspect-square w-full overflow-hidden bg-black flex items-center justify-center">
+                    <img
+                      src={img.url}
+                      alt={img.title}
+                      className="w-full h-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = img.cloudinaryUrl;
+                      }}
+                    />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      <span className="p-1 rounded-full bg-black/70 text-[#D4AF37] flex items-center justify-center shadow">
+                        <Maximize2 className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-2.5 bg-[#17171E] border-t border-white/5 space-y-0.5">
+                    <span className="text-[9px] font-mono text-[#D4AF37] uppercase block truncate">{img.badge}</span>
+                    <p className="text-white text-xs font-semibold truncate">{img.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -240,6 +297,91 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedImage(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-fadeIn overscroll-contain"
+        >
+          <div className="relative w-full max-w-4xl max-h-[95vh] bg-[#121216] border border-[#D4AF37]/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col overscroll-contain">
+            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between bg-[#17171C]">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
+                <h3 className="text-white text-xs sm:text-sm font-bold tracking-wide">{selectedImage.title}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedImage(null)}
+                aria-label="Close photo"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="relative flex-1 bg-black flex items-center justify-center p-2 sm:p-4 min-h-[300px]">
+              <img
+                src={selectedImage.url}
+                alt={selectedImage.title}
+                className="max-h-[75vh] max-w-full object-contain mx-auto rounded-lg shadow-2xl"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = selectedImage.cloudinaryUrl;
+                }}
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const idx = FLEET_IMAGES.findIndex((f) => f.id === selectedImage.id);
+                  const prev = (idx - 1 + FLEET_IMAGES.length) % FLEET_IMAGES.length;
+                  setSelectedImage(FLEET_IMAGES[prev]);
+                }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/70 border border-white/20 text-white hover:border-[#D4AF37] cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const idx = FLEET_IMAGES.findIndex((f) => f.id === selectedImage.id);
+                  const next = (idx + 1) % FLEET_IMAGES.length;
+                  setSelectedImage(FLEET_IMAGES[next]);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/70 border border-white/20 text-white hover:border-[#D4AF37] cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-3 sm:p-4 bg-[#17171C] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+              <span className="text-xs text-gray-400">
+                {FLEET_IMAGES.findIndex((f) => f.id === selectedImage.id) + 1} of {FLEET_IMAGES.length} • {selectedImage.badge}
+              </span>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <a
+                  href={BUSINESS_INFO.phoneTel}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-white hover:text-[#D4AF37] font-semibold text-xs min-h-[38px]"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Call {BUSINESS_INFO.phone}</span>
+                </a>
+                <Link
+                  to="/quote"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs shadow-md min-h-[38px]"
+                >
+                  <span>Get Quote</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
