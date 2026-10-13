@@ -178,7 +178,6 @@ export default function HomePage() {
       setSubmittedQuoteData({
         ...quoteData,
         mailtoUrl: formatted.mailtoUrl,
-        needsActivation: res.needsActivation,
       });
       setQuoteSuccess(true);
       setQuoteData({
@@ -276,7 +275,6 @@ export default function HomePage() {
         resumeFileName: resumeFile ? resumeFile.name : 'Attached Resume',
         fileSize: resumeFile ? (resumeFile.size / 1024).toFixed(1) : '',
         mailtoUrl: formatted.mailtoUrl,
-        needsActivation: res.needsActivation,
       });
       setCareerSuccess(true);
       setCareerData({
@@ -344,7 +342,6 @@ export default function HomePage() {
       setSubmittedContactData({
         ...contactData,
         mailtoUrl: formatted.mailtoUrl,
-        needsActivation: res.needsActivation,
       });
       setContactSuccess(true);
       setContactData({
@@ -1483,18 +1480,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-                {submittedCareerData?.needsActivation && (
-                  <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
-                    <p className="font-bold flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Action Required on {BUSINESS_INFO.email}:</span>
-                    </p>
-                    <p className="text-amber-200/90 leading-relaxed">
-                      FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
-                    </p>
-                  </div>
-                )}
-
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <a
                   href={BUSINESS_INFO.phoneTel}
@@ -1876,18 +1861,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {submittedQuoteData?.needsActivation && (
-                  <div className="max-w-xl mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
-                    <p className="font-bold flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Action Required on {BUSINESS_INFO.email}:</span>
-                    </p>
-                    <p className="text-amber-200/90 leading-relaxed">
-                      FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
-                    </p>
-                  </div>
-                )}
-
                 <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
                   Our dispatchers in Red Deer, AB are reviewing your specifications and will follow up promptly with your rate quote.
                 </p>
@@ -2244,17 +2217,6 @@ export default function HomePage() {
                       </p>
                     </div>
 
-                    {submittedContactData?.needsActivation && (
-                      <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
-                        <p className="font-bold flex items-center gap-1.5">
-                          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                          <span>Action Required on {BUSINESS_INFO.email}:</span>
-                        </p>
-                        <p className="text-amber-200/90 leading-relaxed">
-                          FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
-                        </p>
-                      </div>
-                    )}
                     <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                       {submittedContactData?.mailtoUrl && (
                         <a

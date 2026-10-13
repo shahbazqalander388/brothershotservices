@@ -54,10 +54,7 @@ export const submitQuoteForm = async (data) => {
     if (response.ok || result.success === 'true' || result.success === true || isActivation) {
       return {
         success: true,
-        needsActivation: isActivation,
-        message: isActivation
-          ? 'Form submitted! Please check info.brothershotshot@gmail.com to activate FormSubmit.'
-          : 'Quote request submitted successfully!',
+        message: 'Quote request submitted successfully!',
         data: result,
       };
     } else {
@@ -117,10 +114,7 @@ export const submitContactForm = async (data) => {
     if (response.ok || result.success === 'true' || result.success === true || isActivation) {
       return {
         success: true,
-        needsActivation: isActivation,
-        message: isActivation
-          ? 'Message submitted! Please check info.brothershotshot@gmail.com to activate FormSubmit.'
-          : 'Message submitted successfully!',
+        message: 'Message submitted successfully!',
         data: result,
       };
     } else {
@@ -188,10 +182,7 @@ export const submitCareerForm = async (data, file) => {
     if (response.ok || result.success === 'true' || result.success === true || isActivation) {
       return {
         success: true,
-        needsActivation: isActivation,
-        message: isActivation
-          ? 'Application submitted! Please check info.brothershotshot@gmail.com to activate FormSubmit.'
-          : 'Driver application submitted successfully!',
+        message: 'Driver application submitted successfully!',
         data: result,
       };
     } else {

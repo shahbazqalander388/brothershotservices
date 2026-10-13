@@ -152,7 +152,6 @@ export default function CareersPage() {
         ...formData,
         resumeFileName: resumeFile ? resumeFile.name : 'Attached Resume',
         fileSize: resumeFile ? (resumeFile.size / 1024).toFixed(1) : '',
-        needsActivation: res.needsActivation,
       });
       setSubmitSuccess(true);
       setFormData({
@@ -242,18 +241,6 @@ export default function CareersPage() {
                   <span className="font-mono text-[#D4AF37] font-semibold">{BUSINESS_INFO.email}</span>
                 </div>
               </div>
-
-              {submittedData?.needsActivation && (
-                <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
-                  <p className="font-bold flex items-center gap-1.5">
-                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Action Required on {BUSINESS_INFO.email}:</span>
-                  </p>
-                  <p className="text-amber-200/90 leading-relaxed">
-                    FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
-                  </p>
-                </div>
-              )}
 
               <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
                 We review all Class 1 / hotshot driving submissions and follow up promptly with qualified applicants.
