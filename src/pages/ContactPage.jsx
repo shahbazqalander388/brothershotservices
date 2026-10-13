@@ -5,10 +5,15 @@ import {
   MapPin, 
   Send, 
   ExternalLink, 
-  AlertCircle
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  RotateCcw
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import EmailClientModal from '../components/EmailClientModal';
+import { formatContactInquiry } from '../utils/emailFormatters';
+import { submitContactForm } from '../services/formSubmissionService';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -20,10 +25,16 @@ export default function ContactPage() {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [submitError, setSubmitError] = useState('');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [preparedEmail, setPreparedEmail] = useState({
     subject: '',
     body: '',
+    htmlBody: '',
     mailtoUrl: '',
   });
 
@@ -33,6 +44,7 @@ export default function ContactPage() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
+    if (submitError) setSubmitError('');
   };
 
   const validate = () => {
@@ -49,40 +61,42 @@ export default function ContactPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const emailSubject = `Inquiry: ${formData.subject} - ${formData.name.trim()}`;
-    const emailBody = `CONTACT MESSAGE - BROTHERS HOTSHOT SERVICES
-===============================================
-From: ${formData.name.trim()}
-Email: ${formData.email.trim()}
-Phone: ${formData.phone.trim() || 'Not provided'}
-Subject: ${formData.subject}
+    setIsSubmitting(true);
+    setSubmitError('');
 
-Message:
-${formData.message.trim()}
+    const res = await submitContactForm(formData);
 
-===============================================
-Sent via Brothers Hotshot Services Contact Form.`;
+    setIsSubmitting(false);
 
-    const mailto = `mailto:${BUSINESS_INFO.email}?subject=${encodeURIComponent(
-      emailSubject
-    )}&body=${encodeURIComponent(emailBody)}`;
-
+    const formatted = formatContactInquiry(formData);
     setPreparedEmail({
-      subject: emailSubject,
-      body: emailBody,
-      mailtoUrl: mailto,
+      subject: formatted.subject,
+      body: formatted.plainText,
+      htmlBody: formatted.html,
+      mailtoUrl: formatted.mailtoUrl,
     });
 
-    setIsModalOpen(true);
-
-    try {
-      window.location.href = mailto;
-    } catch (err) {
-      console.log('Mailto triggered', err);
+    if (res.success) {
+      setSubmittedData({
+        ...formData,
+        mailtoUrl: formatted.mailtoUrl,
+        needsActivation: res.needsActivation,
+      });
+      setSubmitSuccess(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: 'Transportation Inquiry',
+        message: '',
+      });
+      window.scrollTo({ top: 200, behavior: 'smooth' });
+    } else {
+      setSubmitError(res.error || 'Failed to submit contact message.');
     }
   };
 
@@ -209,16 +223,83 @@ Sent via Brothers Hotshot Services Contact Form.`;
             {/* Contact Form (Col 7) */}
             <div className="lg:col-span-7">
               <div className="rounded-2xl bg-[#131317] border border-white/10 p-4 sm:p-8 lg:p-10 shadow-2xl">
-                <div className="mb-6 space-y-1">
-                  <h2 className="text-xl sm:text-2xl font-black text-white">
-                    Send Us a Message
-                  </h2>
-                  <p className="text-xs sm:text-sm text-gray-400">
-                    Fill out the form below. We will prepare your message to be sent via your email application.
-                  </p>
-                </div>
+                {submitSuccess ? (
+                  <div className="py-6 sm:py-10 text-center space-y-5 animate-fadeIn">
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.25)]">
+                      <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+                    </div>
+                    <div className="space-y-1.5 max-w-md mx-auto">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+                        Message Sent Online
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-black text-white">
+                        Thank You, {submittedData?.name}!
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                        Your message regarding <strong>{submittedData?.subject}</strong> has been transmitted directly to dispatch at <strong className="text-[#D4AF37] font-mono">{BUSINESS_INFO.email}</strong>. We will reply promptly.
+                      </p>
+                    </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
+                    {submittedData?.needsActivation && (
+                      <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
+                        <p className="font-bold flex items-center gap-1.5">
+                          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>Action Required on {BUSINESS_INFO.email}:</span>
+                        </p>
+                        <p className="text-amber-200/90 leading-relaxed">
+                          FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <a
+                        href={BUSINESS_INFO.phoneTel}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs shadow-md"
+                      >
+                        <Phone className="w-4 h-4" />
+                        <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                      </a>
+                      {submittedData?.mailtoUrl && (
+                        <a
+                          href={submittedData.mailtoUrl}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs min-h-[42px]"
+                        >
+                          <Mail className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Open Direct Email Draft</span>
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setSubmitSuccess(false)}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Send Another Message</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-6 space-y-1">
+                      <h2 className="text-xl sm:text-2xl font-black text-white">
+                        Send Us a Message
+                      </h2>
+                      <p className="text-xs sm:text-sm text-gray-400">
+                        Submit directly to our dispatch operations. We respond promptly.
+                      </p>
+                    </div>
+
+                    {submitError && (
+                      <div className="mb-4 p-3.5 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs space-y-1.5">
+                        <p className="font-bold flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                          <span>Online submission issue: {submitError}</span>
+                        </p>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     {/* Name */}
                     <div className="space-y-1.5">
@@ -322,19 +403,31 @@ Sent via Brothers Hotshot Services Contact Form.`;
                     )}
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 space-y-3">
                     <button
                       type="submit"
-                      className="w-full py-4 px-6 sm:px-8 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
+                      disabled={isSubmitting}
+                      className="w-full py-4 px-6 sm:px-8 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <Send className="w-5 h-5 text-[#0B0B0D]" />
-                      <span>Prepare Email Message</span>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin text-[#0B0B0D]" />
+                          <span>Sending Message...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5 text-[#0B0B0D]" />
+                          <span>Send Message Online</span>
+                        </>
+                      )}
                     </button>
-                    <p className="text-xs text-center text-gray-400 mt-3">
-                      Opens your email client addressed to <strong className="text-gray-300">{BUSINESS_INFO.email}</strong>.
+                    <p className="text-xs text-center text-gray-400">
+                      Direct web transmission to dispatch at <strong className="text-gray-300">{BUSINESS_INFO.email}</strong>.
                     </p>
                   </div>
                 </form>
+              </>
+            )}
               </div>
             </div>
           </div>
@@ -349,6 +442,7 @@ Sent via Brothers Hotshot Services Contact Form.`;
         recipient={BUSINESS_INFO.email}
         subject={preparedEmail.subject}
         body={preparedEmail.body}
+        htmlBody={preparedEmail.htmlBody}
         mailtoUrl={preparedEmail.mailtoUrl}
         isJobApplication={false}
       />

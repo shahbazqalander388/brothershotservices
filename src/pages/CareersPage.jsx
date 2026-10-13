@@ -3,12 +3,17 @@ import {
   Upload, 
   FileText, 
   AlertCircle, 
-  Mail, 
-  Paperclip,
-  Info
+  CheckCircle2,
+  Loader2,
+  Send,
+  RotateCcw,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import EmailClientModal from '../components/EmailClientModal';
+import { formatDriverApplication } from '../utils/emailFormatters';
+import { submitCareerForm } from '../services/formSubmissionService';
 
 export default function CareersPage() {
   // Form State
@@ -30,11 +35,18 @@ export default function CareersPage() {
   const [resumeError, setResumeError] = useState('');
   const [errors, setErrors] = useState({});
 
-  // Submission / Modal State
+  // Webform Submission States
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [submitError, setSubmitError] = useState('');
+
+  // Submission / Modal State (Fallback)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [preparedEmail, setPreparedEmail] = useState({
     subject: '',
     body: '',
+    htmlBody: '',
     mailtoUrl: '',
   });
 
@@ -105,66 +117,61 @@ export default function CareersPage() {
     }
 
     if (!formData.consent) {
-      newErrors.consent = 'You must acknowledge the email application procedure';
+      newErrors.consent = 'You must confirm the certification acknowledgment';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle Form Submission
-  const handleSubmit = (e) => {
+  // Handle Form Submission (Direct Webform via AJAX)
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    const subject = `Driver Job Application: ${formData.position} - ${formData.fullName.trim()}`;
+    setIsSubmitting(true);
+    setSubmitError('');
 
-    const bodyText = `JOB APPLICATION - BROTHERS HOTSHOT SERVICES
-===============================================
+    const res = await submitCareerForm(formData, resumeFile);
 
-APPLICANT INFORMATION:
-• Full Name: ${formData.fullName.trim()}
-• Email Address: ${formData.email.trim()}
-• Phone Number: ${formData.phone.trim()}
-• Location: ${formData.cityProvince.trim()}
+    setIsSubmitting(false);
 
-DRIVING INFORMATION:
-• Position Applying For: ${formData.position}
-• Years of Driving Experience: ${formData.experienceYears}
-• Driver's License Class: ${formData.licenseClass}
-• Valid Driver's License: ${formData.hasValidLicense}
-• Previous Transportation Experience:
-${formData.transportExperience ? formData.transportExperience.trim() : 'N/A'}
-
-RESUME DETAILS:
-• Selected Resume File: ${resumeFile ? resumeFile.name : 'None'} (${resumeFile ? (resumeFile.size / 1024).toFixed(1) + ' KB' : ''})
-*** NOTE: Please ensure this resume file is attached to this email before sending. ***
-
-ADDITIONAL MESSAGE / COVER NOTE:
-${formData.coverLetter ? formData.coverLetter.trim() : 'N/A'}
-
-===============================================
-Consent: Applicant agreed to send application directly via email.`;
-
-    const mailto = `mailto:${BUSINESS_INFO.email}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(bodyText)}`;
-
+    const formatted = formatDriverApplication(formData, resumeFile);
     setPreparedEmail({
-      subject,
-      body: bodyText,
-      mailtoUrl: mailto,
+      subject: formatted.subject,
+      body: formatted.plainText,
+      htmlBody: formatted.html,
+      mailtoUrl: formatted.mailtoUrl,
     });
 
-    setIsModalOpen(true);
-
-    try {
-      window.location.href = mailto;
-    } catch (err) {
-      console.log('Mailto initiated', err);
+    if (res.success) {
+      setSubmittedData({
+        ...formData,
+        resumeFileName: resumeFile ? resumeFile.name : 'Attached Resume',
+        fileSize: resumeFile ? (resumeFile.size / 1024).toFixed(1) : '',
+        needsActivation: res.needsActivation,
+      });
+      setSubmitSuccess(true);
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        cityProvince: '',
+        position: 'Hotshot Driver (Class 1)',
+        experienceYears: '3-5 years',
+        licenseClass: 'Class 1 Commercial',
+        hasValidLicense: 'Yes',
+        transportExperience: '',
+        coverLetter: '',
+        consent: false,
+      });
+      setResumeFile(null);
+    } else {
+      setSubmitError(res.error || 'Failed to submit driver application online.');
+      setIsModalOpen(true);
     }
   };
 
@@ -190,27 +197,129 @@ Consent: Applicant agreed to send application directly via email.`;
       {/* Main Form Section */}
       <section className="py-12 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          {/* Email Instructions Notice Box */}
-          <div className="mb-8 sm:mb-10 p-4 sm:p-5 rounded-2xl bg-[#17171F] border border-[#D4AF37]/40 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start">
-            <Info className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF37] shrink-0 mt-0.5" />
-            <div className="space-y-1.5 text-xs sm:text-sm">
-              <p className="font-bold text-white text-sm sm:text-base">
-                How Our Application Process Works
-              </p>
-              <p className="text-gray-300 leading-relaxed">
-                We use a secure direct-email recruitment workflow. When you complete this form and click{' '}
-                <span className="text-[#D4AF37] font-semibold">“Send Application by Email”</span>, your details will be formatted into an email draft addressed to{' '}
-                <span className="text-white font-mono break-all">{BUSINESS_INFO.email}</span>.
-              </p>
-              <p className="text-[#F5E6B3] text-xs font-medium">
-                Your email application will open in your default email app. Please attach your resume before sending your email to {BUSINESS_INFO.email}.
-              </p>
-            </div>
-          </div>
+          {submitSuccess ? (
+            <div className="rounded-2xl bg-[#131317] border border-[#D4AF37]/50 p-6 sm:p-10 shadow-2xl text-center space-y-6 animate-fadeIn">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 mx-auto flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                <CheckCircle2 className="w-9 h-9 sm:w-10 sm:h-10 text-emerald-400" />
+              </div>
 
-          {/* Form Card */}
-          <div className="rounded-2xl bg-[#131317] border border-white/10 p-4 sm:p-8 lg:p-10 shadow-2xl">
-            <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10" noValidate>
+              <div className="space-y-2 max-w-lg mx-auto">
+                <span className="px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+                  Application Submitted Online
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-white">
+                  Thank You, {submittedData?.fullName}!
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Your driver application for <strong>{submittedData?.position}</strong> along with your resume (<span className="text-[#D4AF37] font-mono">{submittedData?.resumeFileName}</span>) has been transmitted directly to our recruitment team in Red Deer, AB.
+                </p>
+              </div>
+
+              {/* Receipt Summary Card */}
+              <div className="max-w-md mx-auto p-4 sm:p-5 rounded-xl bg-black/60 border border-white/10 text-left text-xs space-y-2.5">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Position Applied:</span>
+                  <span className="font-bold text-white">{submittedData?.position}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Experience / License:</span>
+                  <span className="font-semibold text-gray-200">
+                    {submittedData?.experienceYears} • {submittedData?.licenseClass}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Applicant Location:</span>
+                  <span className="font-semibold text-gray-200">{submittedData?.cityProvince}</span>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/10 pt-2">
+                  <span className="text-gray-400">Confirmation Contact:</span>
+                  <span className="font-semibold text-gray-200">
+                    {submittedData?.phone} • {submittedData?.email}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/10 pt-2">
+                  <span className="text-gray-400">Sent To Dispatch:</span>
+                  <span className="font-mono text-[#D4AF37] font-semibold">{BUSINESS_INFO.email}</span>
+                </div>
+              </div>
+
+              {submittedData?.needsActivation && (
+                <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Action Required on {BUSINESS_INFO.email}:</span>
+                  </p>
+                  <p className="text-amber-200/90 leading-relaxed">
+                    FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
+                  </p>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
+                We review all Class 1 / hotshot driving submissions and follow up promptly with qualified applicants.
+              </p>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={BUSINESS_INFO.phoneTel}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs sm:text-sm shadow-xl min-h-[46px]"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Call Recruitment: {BUSINESS_INFO.phone}</span>
+                </a>
+                {preparedEmail.mailtoUrl && (
+                  <a
+                    href={preparedEmail.mailtoUrl}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
+                  >
+                    <Mail className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Open Direct Email Draft</span>
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSubmitSuccess(false)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Submit Another Application</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Direct Webform Notice Box */}
+              <div className="mb-8 sm:mb-10 p-4 sm:p-5 rounded-2xl bg-[#17171F] border border-[#D4AF37]/40 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start">
+                <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF37] shrink-0 mt-0.5" />
+                <div className="space-y-1 text-xs sm:text-sm">
+                  <p className="font-bold text-white text-sm sm:text-base">
+                    Direct Webform Application
+                  </p>
+                  <p className="text-gray-300 leading-relaxed">
+                    Submit your qualifications and upload your resume directly to our central dispatch and recruitment operations in Red Deer, AB. We promptly review all driver applications.
+                  </p>
+                </div>
+              </div>
+
+              {submitError && (
+                <div className="mb-6 p-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs space-y-2">
+                  <p className="font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>Online Submission Issue: {submitError}</span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white font-semibold text-xs hover:bg-white/15 cursor-pointer"
+                  >
+                    <span>Open Email Client Backup</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Form Card */}
+              <div className="rounded-2xl bg-[#131317] border border-white/10 p-4 sm:p-8 lg:p-10 shadow-2xl">
+                <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10" noValidate>
               {/* 1. PERSONAL INFORMATION */}
               <div className="space-y-5 sm:space-y-6">
                 <div className="border-b border-white/10 pb-3 flex flex-wrap items-center justify-between gap-2">
@@ -495,14 +604,14 @@ Consent: Applicant agreed to send application directly via email.`;
                     </p>
                   )}
 
-                  {/* Attachment Instructions reminder */}
+                  {/* Direct upload note */}
                   <div className="p-3.5 rounded-xl bg-black/60 border border-white/5 text-xs text-gray-300 space-y-1">
                     <p className="font-semibold text-[#F5E6B3] flex items-center gap-1.5">
-                      <Paperclip className="w-3.5 h-3.5 text-[#D4AF37]" />
-                      <span>Important Resume Instruction:</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Direct File Attachment:</span>
                     </p>
                     <p className="text-gray-400 leading-relaxed">
-                      Your email application will open in your default email app. Please attach your resume before sending your email to <strong className="text-gray-300">{BUSINESS_INFO.email}</strong>.
+                      Your selected document will be uploaded and transmitted directly with your application to <strong className="text-gray-300">{BUSINESS_INFO.email}</strong>.
                     </p>
                   </div>
                 </div>
@@ -543,8 +652,7 @@ Consent: Applicant agreed to send application directly via email.`;
                       className="mt-1 accent-[#D4AF37] w-5 h-5 rounded cursor-pointer shrink-0"
                     />
                     <span className="text-xs text-gray-300 leading-relaxed">
-                      I understand that submitting this application form prepares an email addressed to{' '}
-                      <strong className="text-white">{BUSINESS_INFO.email}</strong>, and that I will manually attach my resume file in my email client before sending.
+                      I certify that the information provided in this driver application is accurate and complete to the best of my knowledge.
                     </span>
                   </label>
                   {errors.consent && (
@@ -559,20 +667,32 @@ Consent: Applicant agreed to send application directly via email.`;
               <div className="pt-2 sm:pt-4 space-y-3">
                 <button
                   type="submit"
-                  className="w-full py-4 px-6 sm:px-8 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
+                  disabled={isSubmitting}
+                  className="w-full py-4 px-6 sm:px-8 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[50px] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <Mail className="w-5 h-5 text-[#0B0B0D]" />
-                  <span>Send Application by Email</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin text-[#0B0B0D]" />
+                      <span>Submitting Driver Application...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5 text-[#0B0B0D]" />
+                      <span>Submit Driver Application Online</span>
+                    </>
+                  )}
                 </button>
 
                 <p className="text-[11px] sm:text-xs text-center text-gray-400">
-                  Direct submission to <strong>{BUSINESS_INFO.email}</strong>. No account required.
+                  Direct online submission to recruitment at <strong className="text-gray-300">{BUSINESS_INFO.email}</strong>.
                 </p>
               </div>
             </form>
           </div>
-        </div>
-      </section>
+        </>
+      )}
+    </div>
+  </section>
 
       {/* Confirmation & Email Client Modal */}
       <EmailClientModal
@@ -582,6 +702,7 @@ Consent: Applicant agreed to send application directly via email.`;
         recipient={BUSINESS_INFO.email}
         subject={preparedEmail.subject}
         body={preparedEmail.body}
+        htmlBody={preparedEmail.htmlBody}
         mailtoUrl={preparedEmail.mailtoUrl}
         selectedFile={resumeFile}
         isJobApplication={true}

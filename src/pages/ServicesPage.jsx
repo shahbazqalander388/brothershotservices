@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Truck, 
   Cpu, 
@@ -18,7 +18,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { SERVICES } from '../data/servicesData';
-import { BUSINESS_INFO, HOTSHOT_CAPABILITIES, FLEET_IMAGES } from '../data/businessInfo';
+import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
+import DeliveryServicesSection from '../components/DeliveryServicesSection';
 
 const iconMap = {
   Truck: Truck,
@@ -32,6 +33,7 @@ const iconMap = {
 };
 
 export default function ServicesPage() {
+  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
@@ -63,6 +65,13 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+
+      {/* Delivery Services Section */}
+      <DeliveryServicesSection
+        onSelectService={(serviceTitle) => {
+          navigate(`/quote?loadType=${encodeURIComponent(serviceTitle)}`);
+        }}
+      />
 
       {/* Services List / Cards */}
       <section className="py-12 sm:py-20">

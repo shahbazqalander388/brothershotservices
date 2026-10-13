@@ -7,26 +7,12 @@ import {
   Phone, 
   CheckCircle2, 
   ArrowRight,
-  Truck,
-  Wrench,
-  Zap,
-  Compass,
-  Layers,
   Maximize2,
   X,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { BUSINESS_INFO, HOTSHOT_CAPABILITIES, FLEET_IMAGES } from '../data/businessInfo';
-
-const iconMap = {
-  Truck: Truck,
-  Wrench: Wrench,
-  Zap: Zap,
-  Compass: Compass,
-  Layers: Layers,
-  ShieldCheck: ShieldCheck,
-};
+import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
 
 export default function AboutPage() {
   const [selectedImage, setSelectedImage] = useState(null);

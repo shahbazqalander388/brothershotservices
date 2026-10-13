@@ -3,26 +3,33 @@ import { useSearchParams } from 'react-router-dom';
 import { 
   MapPin, 
   Phone, 
-  ArrowRight, 
   CheckCircle2, 
-  AlertCircle,
-  Clock,
-  Info
+  AlertCircle, 
+  Clock, 
+  Send, 
+  Loader2, 
+  Calendar, 
+  Truck, 
+  RotateCcw,
+  Mail 
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import EmailClientModal from '../components/EmailClientModal';
+import { formatQuoteInquiry } from '../utils/emailFormatters';
+import { submitQuoteForm } from '../services/formSubmissionService';
 
 export default function QuotePage() {
   const [searchParams] = useSearchParams();
   const prefillService = searchParams.get('service') || '';
   const prefillOrigin = searchParams.get('origin') || '';
+  const prefillLoadType = searchParams.get('loadType') || '';
 
-  const initialLoadType = prefillService
+  const initialLoadType = prefillLoadType || (prefillService
     ? prefillService
         .split('-')
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
-    : 'Equipment Transportation';
+    : 'Urgent Hotshot Delivery');
 
   const [formData, setFormData] = useState({
     customerName: '',
@@ -37,10 +44,16 @@ export default function QuotePage() {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [submitError, setSubmitError] = useState('');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [preparedEmail, setPreparedEmail] = useState({
     subject: '',
     body: '',
+    htmlBody: '',
     mailtoUrl: '',
   });
 
@@ -50,6 +63,7 @@ export default function QuotePage() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
+    if (submitError) setSubmitError('');
   };
 
   const validate = () => {
@@ -68,51 +82,44 @@ export default function QuotePage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const subject = `Transportation Quote Request: ${formData.loadType} - ${formData.customerName.trim()}`;
+    setIsSubmitting(true);
+    setSubmitError('');
 
-    const bodyText = `TRANSPORTATION QUOTE INQUIRY
-===========================================
-BROTHERS HOTSHOT SERVICES
-Red Deer, AB | Phone: ${BUSINESS_INFO.phone}
+    // Submit directly as a real webform via AJAX
+    const res = await submitQuoteForm(formData);
 
-CUSTOMER CONTACT:
-• Customer Name: ${formData.customerName.trim()}
-• Email: ${formData.email.trim()}
-• Phone: ${formData.phone.trim()}
+    setIsSubmitting(false);
 
-SHIPMENT DETAILS:
-• Load Type: ${formData.loadType}
-• Pickup Location: ${formData.pickupLocation.trim()}
-• Delivery Location: ${formData.deliveryLocation.trim()}
-• Preferred Pickup Date: ${formData.pickupDate || 'Earliest Available'}
-• Dimensions & Weight: ${formData.dimensionsWeight ? formData.dimensionsWeight.trim() : 'N/A'}
-
-ADDITIONAL DETAILS / INSTRUCTIONS:
-${formData.additionalDetails ? formData.additionalDetails.trim() : 'N/A'}
-
-===========================================
-Requested via Brothers Hotshot Services Online Quote Form.`;
-
-    const mailto = `mailto:${BUSINESS_INFO.email}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(bodyText)}`;
-
+    const formatted = formatQuoteInquiry(formData);
     setPreparedEmail({
-      subject,
-      body: bodyText,
-      mailtoUrl: mailto,
+      subject: formatted.subject,
+      body: formatted.plainText,
+      htmlBody: formatted.html,
+      mailtoUrl: formatted.mailtoUrl,
     });
 
-    setIsModalOpen(true);
-
-    try {
-      window.location.href = mailto;
-    } catch (err) {
-      console.log('Mailto triggered', err);
+    if (res.success) {
+      setSubmittedData({ ...formData, needsActivation: res.needsActivation });
+      setSubmitSuccess(true);
+      setFormData({
+        customerName: '',
+        email: '',
+        phone: '',
+        pickupLocation: '',
+        deliveryLocation: '',
+        loadType: 'Urgent Hotshot Delivery',
+        pickupDate: '',
+        dimensionsWeight: '',
+        additionalDetails: '',
+      });
+      // Scroll to form header area
+      window.scrollTo({ top: 220, behavior: 'smooth' });
+    } else {
+      setSubmitError(res.error || 'Failed to submit quote inquiry. Please try again or call dispatch.');
     }
   };
 
@@ -142,7 +149,119 @@ Requested via Brothers Hotshot Services Online Quote Form.`;
             {/* Form Column (Col 8) */}
             <div className="lg:col-span-8">
               <div className="rounded-2xl bg-[#131317] border border-white/10 p-4 sm:p-8 lg:p-10 shadow-2xl">
-                <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" noValidate>
+                {submitSuccess ? (
+                  <div className="py-6 sm:py-10 px-2 sm:px-6 text-center space-y-6 animate-fadeIn">
+                    <div className="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 mx-auto flex items-center justify-center shadow-[0_0_35px_rgba(16,185,129,0.25)]">
+                      <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                    </div>
+
+                    <div className="space-y-2 max-w-xl mx-auto">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Inquiry Submitted Online</span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Quote Request Submitted Successfully!
+                      </h2>
+                      <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+                        Thank you, <strong className="text-white">{submittedData?.customerName}</strong>. Your freight inquiry has been submitted directly to the Brothers Hotshot Services dispatch team.
+                      </p>
+                    </div>
+
+                    {/* Summary Ticket */}
+                    <div className="max-w-xl mx-auto rounded-2xl bg-black/70 border border-white/15 p-5 text-left text-xs sm:text-sm space-y-3 shadow-xl">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                        <span className="text-gray-400 flex items-center gap-1.5">
+                          <Truck className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Load Type</span>
+                        </span>
+                        <span className="font-bold text-[#D4AF37] text-right">{submittedData?.loadType}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                        <span className="text-gray-400 flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Origin & Destination</span>
+                        </span>
+                        <span className="font-bold text-white text-right">
+                          {submittedData?.pickupLocation} → {submittedData?.deliveryLocation}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                        <span className="text-gray-400 flex items-center gap-1.5">
+                          <Calendar className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Preferred Pickup</span>
+                        </span>
+                        <span className="font-semibold text-gray-200">
+                          {submittedData?.pickupDate || 'Earliest Available'}
+                        </span>
+                      </div>
+                      {submittedData?.dimensionsWeight && (
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                          <span className="text-gray-400">Dimensions & Weight:</span>
+                          <span className="font-semibold text-gray-200">
+                            {submittedData.dimensionsWeight}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+                        <span className="text-gray-400">Confirmation Contact:</span>
+                        <span className="font-semibold text-gray-200">
+                          {submittedData?.phone} • {submittedData?.email}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+                        <span className="text-gray-400">Dispatched To:</span>
+                        <span className="font-mono text-[#D4AF37] font-semibold">
+                          {BUSINESS_INFO.email}
+                        </span>
+                      </div>
+                    </div>
+
+                    {submittedData?.needsActivation && (
+                      <div className="max-w-xl mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
+                        <p className="font-bold flex items-center gap-1.5">
+                          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>Action Required on {BUSINESS_INFO.email}:</span>
+                        </p>
+                        <p className="text-amber-200/90 leading-relaxed">
+                          FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
+                        </p>
+                      </div>
+                    )}
+
+                    <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
+                      Our dispatch team in Red Deer, AB will review your route specifications and follow up promptly with your rate quote.
+                    </p>
+
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <a
+                        href={BUSINESS_INFO.phoneTel}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs sm:text-sm shadow-xl min-h-[46px]"
+                      >
+                        <Phone className="w-4 h-4" />
+                        <span>Urgent Dispatch: {BUSINESS_INFO.phone}</span>
+                      </a>
+                      {preparedEmail.mailtoUrl && (
+                        <a
+                          href={preparedEmail.mailtoUrl}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
+                        >
+                          <Mail className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Open Direct Email Draft</span>
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setSubmitSuccess(false)}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        <span>Submit Another Request</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" noValidate>
                   {/* Contact Information */}
                   <div className="space-y-4 sm:space-y-5">
                     <h2 className="text-base sm:text-lg font-bold text-white border-b border-white/10 pb-2">
@@ -276,13 +395,24 @@ Requested via Brothers Hotshot Services Online Quote Form.`;
                           onChange={handleChange}
                           className="w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border border-white/15 focus:border-[#D4AF37] text-white text-base sm:text-sm focus:outline-none transition-colors"
                         >
+                          <option value="Urgent Hotshot Delivery">Urgent Hotshot Delivery</option>
+                          <option value="Same-Day Delivery">Same-Day Delivery</option>
+                          <option value="Overnight Delivery">Overnight Delivery</option>
+                          <option value="Next-Day Delivery">Next-Day Delivery</option>
+                          <option value="Expedited Freight Delivery">Expedited Freight Delivery</option>
+                          <option value="Small & Medium Package Delivery">Small & Medium Package Delivery</option>
+                          <option value="Flat-Deck & Heavy Load Delivery">Flat-Deck & Heavy Load Delivery</option>
+                          <option value="Emergency Delivery Service">Emergency Delivery Service</option>
+                          <option value="Scheduled Delivery">Scheduled Delivery</option>
+                          <option value="Equipment and Materials Transport">Equipment and Materials Transport</option>
+                          <option value="Parts and Supplies Delivery">Parts and Supplies Delivery</option>
+                          <option value="Long-Distance Delivery">Long-Distance Delivery</option>
+                          <option value="Point-to-Point Transport">Point-to-Point Transport</option>
                           <option value="Hotshot Delivery Services">Hotshot Delivery Services</option>
                           <option value="Equipment Transportation">Equipment Transportation</option>
                           <option value="Parts Delivery">Parts Delivery</option>
                           <option value="Material Transportation">Material Transportation</option>
                           <option value="Urgent Load Transportation">Urgent Load Transportation</option>
-                          <option value="Local Transportation">Local Transportation</option>
-                          <option value="Long-Distance Transportation">Long-Distance Transportation</option>
                           <option value="Other Commercial Cargo">Other Commercial Cargo</option>
                         </select>
                       </div>
@@ -331,26 +461,62 @@ Requested via Brothers Hotshot Services Online Quote Form.`;
                     />
                   </div>
 
+                  {/* Error Banner if any */}
+                  {submitError && (
+                    <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs sm:text-sm space-y-2">
+                      <p className="font-bold flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                        <span>Online submission issue: {submitError}</span>
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 pt-1">
+                        <a
+                          href={BUSINESS_INFO.phoneTel}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 text-white font-bold text-xs hover:bg-red-500/30"
+                        >
+                          <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setIsModalOpen(true)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white font-semibold text-xs hover:bg-white/15 cursor-pointer"
+                        >
+                          <span>Open Email Client Backup</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Submission Notice & Submit */}
                   <div className="pt-2 space-y-4">
                     <div className="p-3.5 sm:p-4 rounded-xl bg-black/50 border border-white/10 text-xs text-gray-400">
                       <p className="flex items-center gap-1.5 text-gray-300 font-semibold mb-1">
-                        <Info className="w-4 h-4 text-[#D4AF37]" />
-                        <span>Email Submission Workflow</span>
+                        <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
+                        <span>Direct Webform Submission</span>
                       </p>
-                      Submitting this form prepares a formatted quote inquiry email addressed to{' '}
-                      <span className="text-[#D4AF37] font-mono break-all">{BUSINESS_INFO.email}</span>. You will be prompted to send the email directly from your email application.
+                      Your quote inquiry is submitted directly to our central dispatch operations in Red Deer, AB. We immediately review your cargo and route specifications to provide competitive rates.
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-4 px-6 sm:px-8 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
+                      disabled={isSubmitting}
+                      className="w-full py-4 px-6 sm:px-8 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer flex items-center justify-center gap-2 min-h-[50px] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <span>Prepare Quote Inquiry Email</span>
-                      <ArrowRight className="w-5 h-5 text-[#0B0B0D]" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin text-[#0B0B0D]" />
+                          <span>Submitting Quote Request...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5 text-[#0B0B0D]" />
+                          <span>Submit Quote Request Online</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
+                )}
               </div>
             </div>
 
@@ -419,8 +585,11 @@ Requested via Brothers Hotshot Services Online Quote Form.`;
         recipient={BUSINESS_INFO.email}
         subject={preparedEmail.subject}
         body={preparedEmail.body}
+        htmlBody={preparedEmail.htmlBody}
         mailtoUrl={preparedEmail.mailtoUrl}
+        selectedFile={null}
         isJobApplication={false}
+        quoteDetails={formData}
       />
     </div>
   );

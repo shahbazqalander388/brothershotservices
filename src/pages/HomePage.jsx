@@ -19,15 +19,25 @@ import {
   FileText,
   AlertCircle,
   ExternalLink,
-  Info,
   Maximize2,
   X,
-  Camera
+  Camera,
+  Loader2,
+  Calendar,
+  RotateCcw,
+  Mail
 } from 'lucide-react';
-import { BUSINESS_INFO, HOTSHOT_CAPABILITIES, FLEET_IMAGES } from '../data/businessInfo';
+import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
 import EmailClientModal from '../components/EmailClientModal';
+import DeliveryServicesSection from '../components/DeliveryServicesSection';
+import { 
+  formatQuoteInquiry, 
+  formatContactInquiry, 
+  formatDriverApplication 
+} from '../utils/emailFormatters';
+import { submitQuoteForm, submitContactForm, submitCareerForm } from '../services/formSubmissionService';
 
 const iconMap = {
   Truck: Truck,
@@ -45,6 +55,11 @@ export default function HomePage() {
   const [showBrandModal, setShowBrandModal] = useState(false);
   // Modal State for Fleet & Marketing Graphics Lightbox
   const [lightboxImage, setLightboxImage] = useState(null);
+
+  // Active prominent setup for Fleet View showcase
+  const [activeFleetItem, setActiveFleetItem] = useState(FLEET_IMAGES[1] || FLEET_IMAGES[0]);
+  // Active image for hero setup card (default to prominent pickup truck and trailer)
+  const [heroActiveImage, setHeroActiveImage] = useState(FLEET_IMAGES[1]?.url || BUSINESS_INFO.logoUrl);
 
   // Lock background scroll when either modal is open
   useEffect(() => {
@@ -64,9 +79,11 @@ export default function HomePage() {
     title: '',
     subject: '',
     body: '',
+    htmlBody: '',
     mailtoUrl: '',
     selectedFile: null,
     isJobApplication: false,
+    quoteDetails: null,
   });
 
   // Quote Form State
@@ -82,6 +99,10 @@ export default function HomePage() {
     additionalDetails: '',
   });
   const [quoteErrors, setQuoteErrors] = useState({});
+  const [isQuoteSubmitting, setIsQuoteSubmitting] = useState(false);
+  const [quoteSuccess, setQuoteSuccess] = useState(false);
+  const [submittedQuoteData, setSubmittedQuoteData] = useState(null);
+  const [quoteSubmitError, setQuoteSubmitError] = useState('');
 
   // Careers Form State
   const [careerData, setCareerData] = useState({
@@ -100,6 +121,10 @@ export default function HomePage() {
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeError, setResumeError] = useState('');
   const [careerErrors, setCareerErrors] = useState({});
+  const [isCareerSubmitting, setIsCareerSubmitting] = useState(false);
+  const [careerSuccess, setCareerSuccess] = useState(false);
+  const [submittedCareerData, setSubmittedCareerData] = useState(null);
+  const [careerSubmitError, setCareerSubmitError] = useState('');
 
   // Contact Form State
   const [contactData, setContactData] = useState({
@@ -110,6 +135,10 @@ export default function HomePage() {
     message: '',
   });
   const [contactErrors, setContactErrors] = useState({});
+  const [isContactSubmitting, setIsContactSubmitting] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
+  const [submittedContactData, setSubmittedContactData] = useState(null);
+  const [contactSubmitError, setContactSubmitError] = useState('');
 
   // -------------------------------------------------------------
   // Quote Form Handlers
@@ -118,9 +147,10 @@ export default function HomePage() {
     const { name, value } = e.target;
     setQuoteData((prev) => ({ ...prev, [name]: value }));
     if (quoteErrors[name]) setQuoteErrors((prev) => ({ ...prev, [name]: '' }));
+    if (quoteSubmitError) setQuoteSubmitError('');
   };
 
-  const handleQuoteSubmit = (e) => {
+  const handleQuoteSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!quoteData.customerName.trim()) errs.customerName = 'Customer Name is required';
@@ -134,44 +164,47 @@ export default function HomePage() {
       return;
     }
 
-    const subject = `Transportation Quote Request: ${quoteData.loadType} - ${quoteData.customerName.trim()}`;
-    const body = `TRANSPORTATION QUOTE INQUIRY
-===========================================
-BROTHERS HOTSHOT SERVICES
-Red Deer, AB | Phone: ${BUSINESS_INFO.phone}
+    setIsQuoteSubmitting(true);
+    setQuoteSubmitError('');
 
-CUSTOMER INFORMATION:
-• Name: ${quoteData.customerName.trim()}
-• Email: ${quoteData.email.trim()}
-• Phone: ${quoteData.phone.trim()}
+    // Direct Webform submission via AJAX
+    const res = await submitQuoteForm(quoteData);
 
-SHIPMENT DETAILS:
-• Load Type: ${quoteData.loadType}
-• Pickup Location: ${quoteData.pickupLocation.trim()}
-• Delivery Location: ${quoteData.deliveryLocation.trim()}
-• Preferred Date: ${quoteData.pickupDate || 'Earliest Available'}
-• Dimensions & Weight: ${quoteData.dimensionsWeight || 'N/A'}
+    setIsQuoteSubmitting(false);
 
-ADDITIONAL DETAILS:
-${quoteData.additionalDetails || 'N/A'}
-===========================================`;
+    const formatted = formatQuoteInquiry(quoteData);
 
-    const mailto = `mailto:${BUSINESS_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    setModalState({
-      isOpen: true,
-      title: 'Ready to Send Quote Inquiry',
-      subject,
-      body,
-      mailtoUrl: mailto,
-      selectedFile: null,
-      isJobApplication: false,
-    });
-
-    try {
-      window.location.href = mailto;
-    } catch (err) {
-      console.log('Mailto initiated', err);
+    if (res.success) {
+      setSubmittedQuoteData({
+        ...quoteData,
+        mailtoUrl: formatted.mailtoUrl,
+        needsActivation: res.needsActivation,
+      });
+      setQuoteSuccess(true);
+      setQuoteData({
+        customerName: '',
+        email: '',
+        phone: '',
+        pickupLocation: '',
+        deliveryLocation: '',
+        loadType: 'Urgent Hotshot Delivery',
+        pickupDate: '',
+        dimensionsWeight: '',
+        additionalDetails: '',
+      });
+    } else {
+      setQuoteSubmitError(res.error || 'Failed to submit quote inquiry online.');
+      setModalState({
+        isOpen: true,
+        title: 'Open Email Client Backup',
+        subject: formatted.subject,
+        body: formatted.plainText,
+        htmlBody: formatted.html,
+        mailtoUrl: formatted.mailtoUrl,
+        selectedFile: null,
+        isJobApplication: false,
+        quoteDetails: quoteData,
+      });
     }
   };
 
@@ -213,7 +246,7 @@ ${quoteData.additionalDetails || 'N/A'}
     if (careerErrors.resume) setCareerErrors((prev) => ({ ...prev, resume: '' }));
   };
 
-  const handleCareerSubmit = (e) => {
+  const handleCareerSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!careerData.fullName.trim()) errs.fullName = 'Full Name is required';
@@ -221,54 +254,58 @@ ${quoteData.additionalDetails || 'N/A'}
     if (!careerData.phone.trim()) errs.phone = 'Phone Number is required';
     if (!careerData.cityProvince.trim()) errs.cityProvince = 'City and Province is required';
     if (!resumeFile) errs.resume = 'Resume file is required';
-    if (!careerData.consent) errs.consent = 'You must confirm the application submission acknowledgment';
+    if (!careerData.consent) errs.consent = 'You must confirm the certification acknowledgment';
 
     if (Object.keys(errs).length > 0) {
       setCareerErrors(errs);
       return;
     }
 
-    const subject = `Driver Job Application: ${careerData.position} - ${careerData.fullName.trim()}`;
-    const body = `DRIVER APPLICATION - BROTHERS HOTSHOT SERVICES
-===============================================
-APPLICANT DETAILS:
-• Full Name: ${careerData.fullName.trim()}
-• Email: ${careerData.email.trim()}
-• Phone: ${careerData.phone.trim()}
-• City/Province: ${careerData.cityProvince.trim()}
+    setIsCareerSubmitting(true);
+    setCareerSubmitError('');
 
-DRIVING QUALIFICATIONS:
-• Position: ${careerData.position}
-• Experience: ${careerData.experienceYears}
-• License Class: ${careerData.licenseClass}
-• Valid License: ${careerData.hasValidLicense}
-• Previous Experience:
-${careerData.transportExperience || 'N/A'}
+    const res = await submitCareerForm(careerData, resumeFile);
 
-RESUME TO ATTACH:
-• File Name: ${resumeFile.name} (${(resumeFile.size / 1024).toFixed(1)} KB)
-*** NOTICE: Please attach this resume file in your email before sending. ***
+    setIsCareerSubmitting(false);
 
-COVER NOTE:
-${careerData.coverLetter || 'N/A'}
-===============================================`;
+    const formatted = formatDriverApplication(careerData, resumeFile);
 
-    const mailto = `mailto:${BUSINESS_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    setModalState({
-      isOpen: true,
-      title: 'Send Driver Application by Email',
-      subject,
-      body,
-      mailtoUrl: mailto,
-      selectedFile: resumeFile,
-      isJobApplication: true,
-    });
-
-    try {
-      window.location.href = mailto;
-    } catch (err) {
-      console.log('Mailto initiated', err);
+    if (res.success) {
+      setSubmittedCareerData({
+        ...careerData,
+        resumeFileName: resumeFile ? resumeFile.name : 'Attached Resume',
+        fileSize: resumeFile ? (resumeFile.size / 1024).toFixed(1) : '',
+        mailtoUrl: formatted.mailtoUrl,
+        needsActivation: res.needsActivation,
+      });
+      setCareerSuccess(true);
+      setCareerData({
+        fullName: '',
+        email: '',
+        phone: '',
+        cityProvince: '',
+        position: 'Hotshot Driver (Class 1)',
+        experienceYears: '3-5 years',
+        licenseClass: 'Class 1 Commercial',
+        hasValidLicense: 'Yes',
+        transportExperience: '',
+        coverLetter: '',
+        consent: false,
+      });
+      setResumeFile(null);
+    } else {
+      setCareerSubmitError(res.error || 'Failed to submit driver application online.');
+      setModalState({
+        isOpen: true,
+        title: 'Open Email Client Backup',
+        subject: formatted.subject,
+        body: formatted.plainText,
+        htmlBody: formatted.html,
+        mailtoUrl: formatted.mailtoUrl,
+        selectedFile: resumeFile,
+        isJobApplication: true,
+        quoteDetails: null,
+      });
     }
   };
 
@@ -279,9 +316,10 @@ ${careerData.coverLetter || 'N/A'}
     const { name, value } = e.target;
     setContactData((prev) => ({ ...prev, [name]: value }));
     if (contactErrors[name]) setContactErrors((prev) => ({ ...prev, [name]: '' }));
+    if (contactSubmitError) setContactSubmitError('');
   };
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!contactData.name.trim()) errs.name = 'Name is required';
@@ -293,34 +331,42 @@ ${careerData.coverLetter || 'N/A'}
       return;
     }
 
-    const subject = `Inquiry: ${contactData.subject} - ${contactData.name.trim()}`;
-    const body = `CONTACT MESSAGE - BROTHERS HOTSHOT SERVICES
-===============================================
-From: ${contactData.name.trim()}
-Email: ${contactData.email.trim()}
-Phone: ${contactData.phone.trim() || 'N/A'}
-Subject: ${contactData.subject}
+    setIsContactSubmitting(true);
+    setContactSubmitError('');
 
-Message:
-${contactData.message.trim()}
-===============================================`;
+    const res = await submitContactForm(contactData);
 
-    const mailto = `mailto:${BUSINESS_INFO.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setIsContactSubmitting(false);
 
-    setModalState({
-      isOpen: true,
-      title: 'Ready to Send Message',
-      subject,
-      body,
-      mailtoUrl: mailto,
-      selectedFile: null,
-      isJobApplication: false,
-    });
+    const formatted = formatContactInquiry(contactData);
 
-    try {
-      window.location.href = mailto;
-    } catch (err) {
-      console.log('Mailto initiated', err);
+    if (res.success) {
+      setSubmittedContactData({
+        ...contactData,
+        mailtoUrl: formatted.mailtoUrl,
+        needsActivation: res.needsActivation,
+      });
+      setContactSuccess(true);
+      setContactData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: 'Transportation Inquiry',
+        message: '',
+      });
+    } else {
+      setContactSubmitError(res.error || 'Failed to submit message online.');
+      setModalState({
+        isOpen: true,
+        title: 'Open Email Client Backup',
+        subject: formatted.subject,
+        body: formatted.plainText,
+        htmlBody: formatted.html,
+        mailtoUrl: formatted.mailtoUrl,
+        selectedFile: null,
+        isJobApplication: false,
+        quoteDetails: null,
+      });
     }
   };
 
@@ -403,19 +449,26 @@ ${contactData.message.trim()}
                 
                 {/* Full Logo Card */}
                 <div className="relative rounded-2xl bg-[#121216] border-2 border-[#D4AF37]/60 shadow-2xl p-3 sm:p-4">
-                  {/* Image container displaying entire logo without any cropping */}
+                  {/* Image container displaying active hero equipment/logo */}
                   <div 
-                    onClick={() => setShowBrandModal(true)}
+                    onClick={() => {
+                      if (heroActiveImage === BUSINESS_INFO.logoUrl) {
+                        setShowBrandModal(true);
+                      } else {
+                        const matched = FLEET_IMAGES.find((img) => img.url === heroActiveImage) || FLEET_IMAGES[1];
+                        setLightboxImage(matched);
+                      }
+                    }}
                     className="relative rounded-xl overflow-hidden bg-black p-2 flex items-center justify-center cursor-pointer group"
-                    title="Click to view full official flyer"
+                    title="Click to view full image in high resolution"
                   >
                     <img
-                      src={BUSINESS_INFO.logoUrl}
-                      alt="Brothers Hotshot Services Official Logo"
+                      src={heroActiveImage}
+                      alt="Brothers Hotshot Services Pickup Truck & Equipment"
                       className="w-full h-auto max-h-[300px] sm:max-h-[360px] object-contain block mx-auto group-hover:scale-[1.01] transition-transform"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = BUSINESS_INFO.cloudinaryLogo;
+                        e.target.src = heroActiveImage === BUSINESS_INFO.logoUrl ? BUSINESS_INFO.cloudinaryLogo : FLEET_IMAGES[1].cloudinaryUrl;
                       }}
                     />
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -452,14 +505,61 @@ ${contactData.message.trim()}
                     </div>
 
                     {/* Fleet Flyer Thumbnails */}
-                    <div className="grid grid-cols-5 gap-1.5 pt-0.5">
-                      {FLEET_IMAGES.map((img) => (
+                    <div className="grid grid-cols-6 gap-1.5 pt-0.5">
+                      {/* Pickup & Gooseneck (Flagship) */}
+                      <button
+                        type="button"
+                        onClick={() => setHeroActiveImage(FLEET_IMAGES[1].url)}
+                        title="Pickup Truck & Gooseneck Trailer Setup"
+                        className={`relative aspect-square rounded-lg overflow-hidden border transition-all group/thumb focus:outline-none bg-black cursor-pointer shadow-sm ${
+                          heroActiveImage === FLEET_IMAGES[1].url
+                            ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]'
+                            : 'border-white/15 hover:border-[#D4AF37]/60'
+                        }`}
+                      >
+                        <img
+                          src={FLEET_IMAGES[1].url}
+                          alt="Pickup Truck & Gooseneck"
+                          className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = FLEET_IMAGES[1].cloudinaryUrl;
+                          }}
+                        />
+                      </button>
+                      {/* Official Flyer */}
+                      <button
+                        type="button"
+                        onClick={() => setHeroActiveImage(BUSINESS_INFO.logoUrl)}
+                        title="Official Transport Flyer"
+                        className={`relative aspect-square rounded-lg overflow-hidden border transition-all group/thumb focus:outline-none bg-black cursor-pointer shadow-sm ${
+                          heroActiveImage === BUSINESS_INFO.logoUrl
+                            ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]'
+                            : 'border-white/15 hover:border-[#D4AF37]/60'
+                        }`}
+                      >
+                        <img
+                          src={BUSINESS_INFO.logoUrl}
+                          alt="Brothers Hotshot Official Setup"
+                          className="w-full h-full object-contain group-hover/thumb:scale-110 transition-transform"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = BUSINESS_INFO.cloudinaryLogo;
+                          }}
+                        />
+                      </button>
+                      {/* Other fleet images */}
+                      {[FLEET_IMAGES[0], FLEET_IMAGES[2], FLEET_IMAGES[3], FLEET_IMAGES[4]].map((img) => (
                         <button
                           key={img.id}
                           type="button"
-                          onClick={() => setLightboxImage(img)}
+                          onClick={() => setHeroActiveImage(img.url)}
                           title={img.title}
-                          className="relative aspect-square rounded-lg overflow-hidden border border-white/15 hover:border-[#D4AF37] transition-all group/thumb focus:outline-none bg-black cursor-pointer shadow-sm"
+                          className={`relative aspect-square rounded-lg overflow-hidden border transition-all group/thumb focus:outline-none bg-black cursor-pointer shadow-sm ${
+                            heroActiveImage === img.url
+                              ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]'
+                              : 'border-white/15 hover:border-[#D4AF37]/60'
+                          }`}
                         >
                           <img
                             src={img.url}
@@ -524,6 +624,15 @@ ${contactData.message.trim()}
           </div>
         </div>
       </section>
+
+      {/* ========================================================
+          DELIVERY SERVICES SECTION ("Flexible Solutions for Every Load")
+      ======================================================== */}
+      <DeliveryServicesSection
+        onSelectService={(serviceTitle) => {
+          setQuoteData((prev) => ({ ...prev, loadType: serviceTitle }));
+        }}
+      />
 
       {/* ========================================================
           2. ABOUT SECTION
@@ -702,144 +811,461 @@ ${contactData.message.trim()}
       </section>
 
       {/* ========================================================
-          4. OFFICIAL TRANSPORT GALLERY SECTION (#gallery)
+          4. OFFICIAL FLEET & TRANSPORT SECTION (#fleet / #gallery)
       ======================================================== */}
       <section id="gallery" className="py-16 sm:py-20 lg:py-24 border-b border-white/10 bg-[#0B0B0D] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12">
+        {/* Anchor for direct #fleet navigation */}
+        <div id="fleet" className="absolute -top-20" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-14">
+          {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Official Transport Gallery
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
+              <Truck className="w-3.5 h-3.5" />
+              <span>Heavy-Duty Equipment & Verified Dispatch</span>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-white tracking-tight">
-              Brothers Hotshot Transport Gallery
+              Hotshot Fleet & Equipment Setup
             </h2>
             <p className="text-gray-400 text-sm sm:text-base lg:text-lg">
-              Official marketing flyers and service transport graphics across Alberta, British Columbia, Saskatchewan, and Manitoba (including Winnipeg). Click any image to view in full resolution.
+              Heavy-duty pickup trucks paired with versatile gooseneck flatbed trailers for agile, dedicated point-to-point hauling throughout Alberta, British Columbia, Saskatchewan, and Manitoba (including Winnipeg).
             </p>
           </div>
 
-          {/* Clean Images Grid - Only Images */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {FLEET_IMAGES.map((item, index) => (
-              <div
-                key={item.id}
-                onClick={() => setLightboxImage(item)}
-                className="group relative rounded-2xl bg-black border border-white/10 hover:border-[#D4AF37] overflow-hidden shadow-2xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer aspect-square flex items-center justify-center p-2"
-              >
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  loading="lazy"
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = item.cloudinaryUrl;
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                  <span className="px-4 py-2 rounded-xl bg-black/85 backdrop-blur-md border border-[#D4AF37] text-[#D4AF37] text-xs font-bold shadow-xl flex items-center gap-2 scale-95 group-hover:scale-100 transition-transform">
-                    <Maximize2 className="w-4 h-4" />
-                    <span>Expand Flyer</span>
+          {/* Top Showcase: Prominent Setup Image & Thumbnails + Verified Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Left 7 Columns: Prominent Pickup Truck & Trailer Image + Thumbnails Arrangement */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Prominent Image Showcase Card */}
+              <div className="rounded-2xl bg-[#121216] border-2 border-[#D4AF37]/60 p-3 sm:p-4 shadow-2xl space-y-3">
+                {/* Header over Image */}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5E6B3] font-bold">
+                    <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>Featured Fleet Setup</span>
+                  </span>
+                  <span className="font-mono text-[#D4AF37] font-semibold text-[11px] sm:text-xs">
+                    {activeFleetItem.badge}
                   </span>
                 </div>
-              </div>
-            ))}
-          </div>
 
-          {/* Featured Transport Spotlight Banner */}
-          <div className="rounded-2xl bg-gradient-to-br from-[#1A1A22] via-[#141418] to-[#101014] border border-[#D4AF37]/50 p-6 sm:p-8 lg:p-10 shadow-2xl">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Left Column: Official Brand Artwork */}
-              <div className="lg:col-span-5 flex flex-col items-center justify-center">
-                <div 
-                  onClick={() => setShowBrandModal(true)}
-                  className="relative rounded-2xl bg-black p-3 border-2 border-[#D4AF37]/60 shadow-xl cursor-pointer group max-w-[320px] w-full"
-                  title="Click to view full official flyer"
+                {/* Main Prominent Image Viewport */}
+                <div
+                  onClick={() => setLightboxImage(activeFleetItem)}
+                  className="relative rounded-xl overflow-hidden bg-black p-2 flex items-center justify-center cursor-pointer group aspect-[16/10] sm:aspect-[16/9] border border-white/10"
+                  title="Click to expand high-resolution view"
                 >
                   <img
-                    src={BUSINESS_INFO.logoUrl}
-                    alt="Brothers Hotshot Services Official Setup"
-                    className="w-full h-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform"
+                    src={activeFleetItem.url}
+                    alt={activeFleetItem.title}
+                    className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = BUSINESS_INFO.cloudinaryLogo;
+                      e.target.src = activeFleetItem.cloudinaryUrl;
                     }}
                   />
-                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-gray-300">
-                    <span className="text-[#D4AF37] font-semibold flex items-center gap-1">
-                      <Truck className="w-3.5 h-3.5" />
-                      <span>Official Transport Setup</span>
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3 sm:p-4 pointer-events-none">
+                    <span className="text-xs text-white font-medium truncate max-w-[75%]">
+                      {activeFleetItem.title}
                     </span>
-                    <span className="text-[11px] text-gray-400 group-hover:text-white transition-colors flex items-center gap-1">
-                      <Maximize2 className="w-3 h-3" />
-                      <span>Expand Flyer</span>
+                    <span className="px-3 py-1.5 rounded-lg bg-black/90 border border-[#D4AF37] text-[#D4AF37] text-xs font-bold flex items-center gap-1.5 shadow-lg">
+                      <Maximize2 className="w-3.5 h-3.5" />
+                      <span>Enlarge</span>
                     </span>
                   </div>
                 </div>
-              </div>
 
-              {/* Right Column: Hotshot Operating Standards & Direct Action */}
-              <div className="lg:col-span-7 space-y-5">
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#F5E6B3] text-xs font-semibold">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    <span>The Hotshot Advantage</span>
+                {/* Active Item Details */}
+                <div className="pt-2 px-1 space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                      {activeFleetItem.title}
+                    </h3>
+                    <span className="text-[10px] sm:text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                      {activeFleetItem.category}
+                    </span>
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-black text-white">
-                    Direct Point-to-Point Transport Across Western Canada
-                  </h3>
                   <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                    Unlike traditional freight carriers that shuffle cargo through sorting terminals and depots, Brothers Hotshot Services loads your shipment onto our dedicated pickup truck and trailer setup and drives directly to your destination.
+                    {activeFleetItem.description}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs text-gray-300">
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                    <p className="font-bold text-white flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
-                      <span>Zero Terminal Delays</span>
-                    </p>
-                    <p className="text-gray-400 text-[11px]">Your cargo stays on one dedicated trailer until delivered.</p>
+                {/* Improved Fleet Thumbnails Arrangement */}
+                <div className="pt-3 border-t border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span className="font-semibold text-white flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Select Equipment View ({FLEET_IMAGES.length + 1} Available)</span>
+                    </span>
+                    <span className="text-[11px] text-gray-400 hidden sm:inline">
+                      Click thumbnail to inspect setup
+                    </span>
                   </div>
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                    <p className="font-bold text-white flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
-                      <span>Central Red Deer Dispatch</span>
-                    </p>
-                    <p className="text-gray-400 text-[11px]">Rapid deployment along the QEII corridor to all provinces.</p>
+
+                  {/* Clean responsive thumbnails bar with gold highlight rings */}
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
+                    {/* Pickup & Gooseneck (Primary) */}
+                    {FLEET_IMAGES.map((img) => {
+                      const isActive = activeFleetItem.id === img.id;
+                      return (
+                        <button
+                          key={img.id}
+                          type="button"
+                          onClick={() => setActiveFleetItem(img)}
+                          className={`relative aspect-square rounded-xl overflow-hidden p-1 bg-black transition-all cursor-pointer text-left group focus:outline-none ${
+                            isActive
+                              ? 'ring-2 ring-[#D4AF37] border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.4)] scale-[1.02]'
+                              : 'border border-white/15 hover:border-[#D4AF37]/60 opacity-75 hover:opacity-100'
+                          }`}
+                          title={img.title}
+                        >
+                          <img
+                            src={img.url}
+                            alt={img.title}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = img.cloudinaryUrl;
+                            }}
+                          />
+                          {isActive && (
+                            <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-[#D4AF37]" />
+                          )}
+                        </button>
+                      );
+                    })}
+
+                    {/* Official Flyer Thumbnail */}
+                    <button
+                      type="button"
+                      onClick={() => setShowBrandModal(true)}
+                      className="relative aspect-square rounded-xl overflow-hidden p-1 bg-black border border-white/15 hover:border-[#D4AF37]/60 opacity-75 hover:opacity-100 transition-all cursor-pointer group focus:outline-none"
+                      title="View Official Transport Setup Flyer"
+                    >
+                      <img
+                        src={BUSINESS_INFO.logoUrl}
+                        alt="Official Transport Setup Flyer"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = BUSINESS_INFO.cloudinaryLogo;
+                        }}
+                      />
+                      <span className="absolute inset-x-0 bottom-0 bg-black/85 text-[9px] text-[#D4AF37] text-center font-bold py-0.5 truncate">
+                        Flyer
+                      </span>
+                    </button>
                   </div>
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                    <p className="font-bold text-white flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                      <span>Agile Job Site Access</span>
-                    </p>
-                    <p className="text-gray-400 text-[11px]">Pickup trucks easily maneuver tight yards and field leases.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right 5 Columns: Verified Business Location & Verified Contact Information */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Card 1: Verified Location Card */}
+              <div className="rounded-2xl bg-gradient-to-br from-[#16161C] to-[#0F0F13] border border-white/15 hover:border-[#D4AF37]/50 p-5 sm:p-6 shadow-xl space-y-4 transition-all">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-black border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] shadow">
+                    <MapPin className="w-5 h-5" />
                   </div>
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                    <p className="font-bold text-white flex items-center gap-1.5">
-                      <Zap className="w-3.5 h-3.5 text-[#D4AF37]" />
-                      <span>24/7 Real-Time Tracking</span>
-                    </p>
-                    <p className="text-gray-400 text-[11px]">Direct communication with dispatch and drivers at every step.</p>
-                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Verified Business Location</span>
+                  </span>
                 </div>
 
-                <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-3">
+                <div>
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-mono">
+                    Operational Dispatch Hub
+                  </p>
+                  <h4 className="text-lg sm:text-xl font-black text-white mt-0.5">
+                    Brothers Hotshot Services HQ
+                  </h4>
+                  <p className="text-sm font-bold text-metallic-gold mt-1.5">
+                    {BUSINESS_INFO.address.full}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+                    Centrally positioned in Red Deer, Alberta along the QEII corridor midway between Calgary and Edmonton. Instant highway access for non-stop transport east to Saskatchewan, west to British Columbia, and east to Winnipeg, Manitoba.
+                  </p>
+                </div>
+
+                <div className="pt-1">
                   <a
-                    href="#quote"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm tracking-wide shadow-lg hover:shadow-[#D4AF37]/30 transition-all min-h-[44px]"
+                    href={BUSINESS_INFO.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white hover:text-[#D4AF37] font-semibold text-xs transition-all min-h-[42px]"
                   >
-                    <span>Request Instant Quote</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                  <a
-                    href={BUSINESS_INFO.phoneTel}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 border border-white/15 text-white hover:text-[#D4AF37] font-bold text-xs sm:text-sm min-h-[44px]"
-                  >
-                    <Phone className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                    <span>View Address on Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#D4AF37]" />
                   </a>
                 </div>
+              </div>
+
+              {/* Card 2: Verified Contact Information Card */}
+              <div className="rounded-2xl bg-gradient-to-br from-[#16161C] via-[#131317] to-[#0F0F13] border-2 border-[#D4AF37]/50 p-5 sm:p-6 shadow-xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-black border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F5E6B3] text-xs font-semibold">
+                    <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>24/7 Dispatch Coordination</span>
+                  </span>
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-mono">
+                    Verified Direct Dispatch Phone
+                  </p>
+                  <a
+                    href={BUSINESS_INFO.phoneTel}
+                    className="text-2xl sm:text-3xl font-black text-white hover:text-[#D4AF37] transition-colors block mt-1 tracking-tight font-mono"
+                  >
+                    {BUSINESS_INFO.phone}
+                  </a>
+                  <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-xs">
+                    <span className="text-gray-400">Direct Email:</span>
+                    <a
+                      href={BUSINESS_INFO.emailMailto}
+                      className="text-gray-200 hover:text-[#D4AF37] font-medium underline"
+                    >
+                      {BUSINESS_INFO.email}
+                    </a>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+                    Immediate direct-line connection with dispatchers for urgent quote turnaround, equipment mobilization, and live journey tracking.
+                  </p>
+                </div>
+
+                <div className="pt-1 grid grid-cols-2 gap-2.5">
+                  <a
+                    href={BUSINESS_INFO.phoneTel}
+                    className="inline-flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs sm:text-sm shadow-md hover:shadow-[#D4AF37]/30 transition-all min-h-[44px]"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call Dispatch</span>
+                  </a>
+                  <a
+                    href="#quote"
+                    className="inline-flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white hover:text-[#D4AF37] font-semibold text-xs sm:text-sm transition-all min-h-[44px]"
+                  >
+                    <span>Get a Quote</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Showcase: Relevant Service Categories in Compact Cards */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-wider text-[#D4AF37]">
+                  Service Categories
+                </span>
+                <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight">
+                  Hotshot Transportation Offerings
+                </h3>
+              </div>
+              <a
+                href="#services"
+                className="text-xs text-[#D4AF37] hover:underline font-semibold flex items-center gap-1"
+              >
+                <span>Full Details</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+              {/* Card 1: Urgent Hotshot Delivery */}
+              <div className="rounded-2xl bg-gradient-to-b from-[#16161C] to-[#101014] border border-white/10 hover:border-[#D4AF37]/60 p-5 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between space-y-4 group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-black border border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37]">
+                      <Zap className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#F5E6B3]">
+                      Priority Direct
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white group-hover:text-metallic-gold transition-colors">
+                      Urgent Hotshot Delivery
+                    </h4>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      Time-critical freight dispatched immediately with non-stop highway transit and zero terminal delays.
+                    </p>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-gray-300 pt-1 border-t border-white/5">
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Dedicated single-truck routing</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>24/7 driver mobilization</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Real-time ETA communication</span>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuoteData((prev) => ({ ...prev, loadType: 'Urgent Hotshot Delivery' }));
+                    document.getElementById('quote')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-[#D4AF37] text-gray-300 hover:text-black border border-white/10 hover:border-[#D4AF37] text-xs font-bold transition-all min-h-[38px] cursor-pointer"
+                >
+                  <span>Select for Quote</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Card 2: Equipment & Machinery Transport */}
+              <div className="rounded-2xl bg-gradient-to-b from-[#16161C] to-[#101014] border border-white/10 hover:border-[#D4AF37]/60 p-5 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between space-y-4 group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-black border border-gray-400/40 flex items-center justify-center text-gray-200">
+                      <Wrench className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                      Gooseneck Ramps
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white group-hover:text-metallic-gold transition-colors">
+                      Equipment & Machinery
+                    </h4>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      Safe drive-on and crane loading for skid steers, mini-excavators, implements, and compact industrial tools.
+                    </p>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-gray-300 pt-1 border-t border-white/5">
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Low-angle beavertail ramps</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Grade-70 transport chains</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Site & lease direct access</span>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuoteData((prev) => ({ ...prev, loadType: 'Equipment & Machinery Hauling' }));
+                    document.getElementById('quote')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-[#D4AF37] text-gray-300 hover:text-black border border-white/10 hover:border-[#D4AF37] text-xs font-bold transition-all min-h-[38px] cursor-pointer"
+                >
+                  <span>Select for Quote</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Card 3: Materials & Supplies Delivery */}
+              <div className="rounded-2xl bg-gradient-to-b from-[#16161C] to-[#101014] border border-white/10 hover:border-[#D4AF37]/60 p-5 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between space-y-4 group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-black border border-gray-400/40 flex items-center justify-center text-gray-200">
+                      <Layers className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                      Flatdeck Deck
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white group-hover:text-metallic-gold transition-colors">
+                      Materials & Supplies
+                    </h4>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      Pipe bundles, structural steel, crated parts, building components, and pallets with weather tarp protection.
+                    </p>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-gray-300 pt-1 border-t border-white/5">
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>360° crane & forklift access</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Heavy 4-inch ratchet straps</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Fitted weather tarps available</span>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuoteData((prev) => ({ ...prev, loadType: 'Industrial Materials & Critical Cargo' }));
+                    document.getElementById('quote')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-[#D4AF37] text-gray-300 hover:text-black border border-white/10 hover:border-[#D4AF37] text-xs font-bold transition-all min-h-[38px] cursor-pointer"
+                >
+                  <span>Select for Quote</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Card 4: Western Canada Interprovincial Corridors */}
+              <div className="rounded-2xl bg-gradient-to-b from-[#16161C] to-[#101014] border border-white/10 hover:border-[#D4AF37]/60 p-5 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between space-y-4 group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-black border border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37]">
+                      <Compass className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[#F5E6B3]">
+                      AB • BC • SK • MB
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-white group-hover:text-metallic-gold transition-colors">
+                      Interprovincial Corridors
+                    </h4>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      Cross-border highway transit connecting Alberta, BC, Saskatchewan, and Manitoba (including regular Winnipeg runs).
+                    </p>
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-gray-300 pt-1 border-t border-white/5">
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Direct Trans-Canada routing</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Dedicated single-carrier custody</span>
+                    </li>
+                    <li className="flex items-center gap-1.5 text-gray-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>Frequent Winnipeg service</span>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuoteData((prev) => ({ ...prev, loadType: 'Long-Distance & Regional Delivery' }));
+                    document.getElementById('quote')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-[#D4AF37] text-gray-300 hover:text-black border border-white/10 hover:border-[#D4AF37] text-xs font-bold transition-all min-h-[38px] cursor-pointer"
+                >
+                  <span>Select for Quote</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
               </div>
             </div>
           </div>
@@ -1008,27 +1434,119 @@ ${contactData.message.trim()}
               Join the Brothers Hotshot Services Team
             </h2>
             <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-              Interested in driving with us? Complete the application form and send your resume to our recruitment email.
+              We are expanding our professional hotshot driver network. Submit your application and upload your resume directly online.
             </p>
           </div>
 
-          {/* Email notice box */}
-          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#17171F] border border-[#D4AF37]/40 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start text-xs sm:text-sm">
-            <Info className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p className="font-bold text-white text-sm sm:text-base">Direct Recruitment Workflow</p>
-              <p className="text-gray-300 leading-relaxed">
-                Submitting this application prepares your details in an email draft addressed to <strong className="text-white">{BUSINESS_INFO.email}</strong>.
-              </p>
-              <p className="text-[#F5E6B3] text-xs">
-                Your email application will open in your default email app. Please attach your resume before sending your email to {BUSINESS_INFO.email}.
-              </p>
-            </div>
-          </div>
+          {careerSuccess ? (
+            <div className="rounded-2xl bg-[#131317] border border-[#D4AF37]/50 p-6 sm:p-10 shadow-2xl text-center space-y-6 animate-fadeIn">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 mx-auto flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                <CheckCircle2 className="w-9 h-9 sm:w-10 sm:h-10 text-emerald-400" />
+              </div>
 
-          {/* Careers Form */}
-          <div className="rounded-2xl bg-[#131317] border border-white/10 p-5 sm:p-8 lg:p-10 shadow-2xl">
-            <form onSubmit={handleCareerSubmit} className="space-y-8" noValidate>
+              <div className="space-y-2 max-w-lg mx-auto">
+                <span className="px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+                  Application Submitted Online
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  Thank You, {submittedCareerData?.fullName}!
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Your driver application for <strong>{submittedCareerData?.position}</strong> along with your resume (<span className="text-[#D4AF37] font-mono">{submittedCareerData?.resumeFileName}</span>) has been successfully transmitted directly to our recruitment team in Red Deer, AB.
+                </p>
+              </div>
+
+              <div className="max-w-md mx-auto p-4 sm:p-5 rounded-xl bg-black/60 border border-white/10 text-left text-xs space-y-2.5">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Position Applied:</span>
+                  <span className="font-bold text-white">{submittedCareerData?.position}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Experience / License:</span>
+                  <span className="font-semibold text-gray-200">
+                    {submittedCareerData?.experienceYears} • {submittedCareerData?.licenseClass}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Applicant Location:</span>
+                  <span className="font-semibold text-gray-200">{submittedCareerData?.cityProvince}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-gray-400">Confirmation Contact:</span>
+                  <span className="font-semibold text-gray-200">
+                    {submittedCareerData?.phone} • {submittedCareerData?.email}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Sent To Dispatch:</span>
+                  <span className="font-mono text-[#D4AF37] font-semibold">{BUSINESS_INFO.email}</span>
+                </div>
+              </div>
+
+                {submittedCareerData?.needsActivation && (
+                  <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
+                    <p className="font-bold flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Action Required on {BUSINESS_INFO.email}:</span>
+                    </p>
+                    <p className="text-amber-200/90 leading-relaxed">
+                      FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
+                    </p>
+                  </div>
+                )}
+
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={BUSINESS_INFO.phoneTel}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs sm:text-sm shadow-xl min-h-[46px]"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Call Recruitment: {BUSINESS_INFO.phone}</span>
+                </a>
+                {submittedCareerData?.mailtoUrl && (
+                  <a
+                    href={submittedCareerData.mailtoUrl}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
+                  >
+                    <Mail className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Open Direct Email Draft</span>
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setCareerSuccess(false)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Submit Another Application</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Direct Webform notice box */}
+              <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#17171F] border border-[#D4AF37]/40 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start text-xs sm:text-sm">
+                <CheckCircle2 className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-bold text-white text-sm sm:text-base">Direct Webform Application</p>
+                  <p className="text-gray-300 leading-relaxed">
+                    Submit your driving qualifications and upload your resume directly to our central dispatch and recruitment operations in Red Deer, AB. We promptly review all applications.
+                  </p>
+                </div>
+              </div>
+
+              {careerSubmitError && (
+                <div className="mb-6 p-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs space-y-2">
+                  <p className="font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>Online Submission Issue: {careerSubmitError}</span>
+                  </p>
+                </div>
+              )}
+
+              {/* Careers Form */}
+              <div className="rounded-2xl bg-[#131317] border border-white/10 p-5 sm:p-8 lg:p-10 shadow-2xl">
+                <form onSubmit={handleCareerSubmit} className="space-y-8" noValidate>
               {/* Personal Information */}
               <div className="space-y-4">
                 <h3 className="text-base sm:text-lg font-bold text-white border-b border-white/10 pb-2">
@@ -1241,24 +1759,38 @@ ${contactData.message.trim()}
                     className="mt-1 accent-[#D4AF37] w-5 h-5 rounded shrink-0"
                   />
                   <span className="text-xs text-gray-300 leading-relaxed">
-                    I understand that submitting this application form prepares an email addressed to{' '}
-                    <strong className="text-white">{BUSINESS_INFO.email}</strong>, and that I will manually attach my resume file in my email client before sending.
+                    I certify that the information provided in this driver application is accurate and complete to the best of my knowledge.
                   </span>
                 </label>
                 {careerErrors.consent && <p className="text-xs text-red-400">{careerErrors.consent}</p>}
 
                 <button
                   type="submit"
-                  className="w-full py-4 px-6 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer min-h-[48px] flex items-center justify-center gap-2"
+                  disabled={isCareerSubmitting}
+                  className="w-full py-4 px-6 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer min-h-[50px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-5 h-5 text-[#0B0B0D]" />
-                  <span>Send Application by Email</span>
+                  {isCareerSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin text-[#0B0B0D]" />
+                      <span>Submitting Driver Application...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5 text-[#0B0B0D]" />
+                      <span>Submit Driver Application Online</span>
+                    </>
+                  )}
                 </button>
+                <p className="text-[11px] sm:text-xs text-center text-gray-400">
+                  Direct online submission to recruitment at <strong className="text-gray-300">{BUSINESS_INFO.email}</strong>.
+                </p>
               </div>
             </form>
           </div>
-        </div>
-      </section>
+        </>
+      )}
+    </div>
+  </section>
 
       {/* ========================================================
           6. GET A QUOTE SECTION
@@ -1278,7 +1810,117 @@ ${contactData.message.trim()}
           </div>
 
           <div className="rounded-2xl bg-[#131317] border border-white/10 p-5 sm:p-8 lg:p-10 shadow-2xl">
-            <form onSubmit={handleQuoteSubmit} className="space-y-6" noValidate>
+            {quoteSuccess ? (
+              <div className="py-6 sm:py-10 px-2 sm:px-6 text-center space-y-6 animate-fadeIn">
+                <div className="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 mx-auto flex items-center justify-center shadow-[0_0_35px_rgba(16,185,129,0.25)]">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                </div>
+
+                <div className="space-y-2 max-w-xl mx-auto">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Inquiry Submitted Online</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    Quote Request Submitted Successfully!
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+                    Thank you, <strong className="text-white">{submittedQuoteData?.customerName}</strong>. Your freight inquiry has been submitted directly to Brothers Hotshot Services dispatch.
+                  </p>
+                </div>
+
+                {/* Summary Ticket */}
+                <div className="max-w-xl mx-auto rounded-2xl bg-black/70 border border-white/15 p-5 text-left text-xs sm:text-sm space-y-3 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <span className="text-gray-400 flex items-center gap-1.5">
+                      <Truck className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Load Type</span>
+                    </span>
+                    <span className="font-bold text-[#D4AF37] text-right">{submittedQuoteData?.loadType}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <span className="text-gray-400 flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Origin & Destination</span>
+                    </span>
+                    <span className="font-bold text-white text-right">
+                      {submittedQuoteData?.pickupLocation} → {submittedQuoteData?.deliveryLocation}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <span className="text-gray-400 flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Preferred Pickup</span>
+                    </span>
+                    <span className="font-semibold text-gray-200">
+                      {submittedQuoteData?.pickupDate || 'Earliest Available'}
+                    </span>
+                  </div>
+                  {submittedQuoteData?.dimensionsWeight && (
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                      <span className="text-gray-400">Dimensions & Weight:</span>
+                      <span className="font-semibold text-gray-200">
+                        {submittedQuoteData.dimensionsWeight}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+                    <span className="text-gray-400">Confirmation Contact:</span>
+                    <span className="font-semibold text-gray-200">
+                      {submittedQuoteData?.phone} • {submittedQuoteData?.email}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+                    <span className="text-gray-400">Dispatched To:</span>
+                    <span className="font-mono text-[#D4AF37] font-semibold">{BUSINESS_INFO.email}</span>
+                  </div>
+                </div>
+
+                {submittedQuoteData?.needsActivation && (
+                  <div className="max-w-xl mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
+                    <p className="font-bold flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Action Required on {BUSINESS_INFO.email}:</span>
+                    </p>
+                    <p className="text-amber-200/90 leading-relaxed">
+                      FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
+                  Our dispatchers in Red Deer, AB are reviewing your specifications and will follow up promptly with your rate quote.
+                </p>
+
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <a
+                    href={BUSINESS_INFO.phoneTel}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs sm:text-sm shadow-xl min-h-[46px]"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Urgent Dispatch: {BUSINESS_INFO.phone}</span>
+                  </a>
+                  {submittedQuoteData?.mailtoUrl && (
+                    <a
+                      href={submittedQuoteData.mailtoUrl}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
+                    >
+                      <Mail className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Open Direct Email Draft</span>
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setQuoteSuccess(false)}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    <span>Submit Another Request</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleQuoteSubmit} className="space-y-6" noValidate>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-gray-300 block">Customer Name *</label>
@@ -1367,13 +2009,24 @@ ${contactData.message.trim()}
                     onChange={handleQuoteChange}
                     className="w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border border-white/15 focus:border-[#D4AF37] text-white text-base sm:text-sm focus:outline-none"
                   >
+                    <option value="Urgent Hotshot Delivery">Urgent Hotshot Delivery</option>
+                    <option value="Same-Day Delivery">Same-Day Delivery</option>
+                    <option value="Overnight Delivery">Overnight Delivery</option>
+                    <option value="Next-Day Delivery">Next-Day Delivery</option>
+                    <option value="Expedited Freight Delivery">Expedited Freight Delivery</option>
+                    <option value="Small & Medium Package Delivery">Small & Medium Package Delivery</option>
+                    <option value="Flat-Deck & Heavy Load Delivery">Flat-Deck & Heavy Load Delivery</option>
+                    <option value="Emergency Delivery Service">Emergency Delivery Service</option>
+                    <option value="Scheduled Delivery">Scheduled Delivery</option>
+                    <option value="Equipment and Materials Transport">Equipment and Materials Transport</option>
+                    <option value="Parts and Supplies Delivery">Parts and Supplies Delivery</option>
+                    <option value="Long-Distance Delivery">Long-Distance Delivery</option>
+                    <option value="Point-to-Point Transport">Point-to-Point Transport</option>
                     <option value="Hotshot Delivery Services">Hotshot Delivery Services</option>
                     <option value="Equipment Transportation">Equipment Transportation</option>
                     <option value="Parts Delivery">Parts Delivery</option>
                     <option value="Material Transportation">Material Transportation</option>
                     <option value="Urgent Load Transportation">Urgent Load Transportation</option>
-                    <option value="Local Transportation">Local Transportation</option>
-                    <option value="Long-Distance Transportation">Long-Distance Transportation</option>
                     <option value="Other Commercial Cargo">Other Commercial Cargo</option>
                   </select>
                 </div>
@@ -1414,14 +2067,72 @@ ${contactData.message.trim()}
                 />
               </div>
 
+              {/* Error Banner if any */}
+              {quoteSubmitError && (
+                <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs sm:text-sm space-y-2">
+                  <p className="font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>Online submission issue: {quoteSubmitError}</span>
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <a
+                      href={BUSINESS_INFO.phoneTel}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 text-white font-bold text-xs hover:bg-red-500/30"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const formatted = formatQuoteInquiry(quoteData);
+                        setModalState({
+                          isOpen: true,
+                          title: 'Open Email Client Backup',
+                          subject: formatted.subject,
+                          body: formatted.plainText,
+                          htmlBody: formatted.html,
+                          mailtoUrl: formatted.mailtoUrl,
+                          selectedFile: null,
+                          isJobApplication: false,
+                          quoteDetails: quoteData,
+                        });
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white font-semibold text-xs hover:bg-white/15 cursor-pointer"
+                    >
+                      <span>Open Email Client Backup</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-3.5 sm:p-4 rounded-xl bg-black/50 border border-white/10 text-xs text-gray-400">
+                <p className="flex items-center gap-1.5 text-gray-300 font-semibold mb-1">
+                  <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Direct Webform Submission</span>
+                </p>
+                Your quote inquiry is securely transmitted directly to our central dispatch operations in Red Deer, AB. We immediately review your cargo and route specifications.
+              </div>
+
               <button
                 type="submit"
-                className="w-full py-4 px-6 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer min-h-[48px] flex items-center justify-center gap-2"
+                disabled={isQuoteSubmitting}
+                className="w-full py-4 px-6 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer min-h-[50px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span>Prepare Quote Inquiry Email</span>
-                <ArrowRight className="w-5 h-5 text-[#0B0B0D]" />
+                {isQuoteSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin text-[#0B0B0D]" />
+                    <span>Submitting Quote Request...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5 text-[#0B0B0D]" />
+                    <span>Submit Quote Request Online</span>
+                  </>
+                )}
               </button>
             </form>
+            )}
           </div>
         </div>
       </section>
@@ -1516,94 +2227,177 @@ ${contactData.message.trim()}
             {/* Contact Form */}
             <div className="lg:col-span-7">
               <div className="rounded-2xl bg-[#131317] border border-white/10 p-5 sm:p-8 shadow-2xl">
-                <h3 className="text-xl font-bold text-white mb-1">Send Us a Direct Message</h3>
-                <p className="text-xs text-gray-400 mb-6">Prepares a message to send directly via your email client.</p>
-
-                <form onSubmit={handleContactSubmit} className="space-y-4" noValidate>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-300 block">Your Name *</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={contactData.name}
-                        onChange={handleContactChange}
-                        placeholder="e.g. David Miller"
-                        className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
-                          contactErrors.name ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
-                        } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
-                      />
-                      {contactErrors.name && <p className="text-xs text-red-400">{contactErrors.name}</p>}
+                {contactSuccess ? (
+                  <div className="py-6 sm:py-8 text-center space-y-5 animate-fadeIn">
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.25)]">
+                      <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+                    </div>
+                    <div className="space-y-1.5 max-w-md mx-auto">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+                        Message Sent Online
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-black text-white">
+                        Thank You, {submittedContactData?.name}!
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                        Your message regarding <strong>{submittedContactData?.subject}</strong> has been transmitted directly to dispatch at <strong className="text-[#D4AF37] font-mono">{BUSINESS_INFO.email}</strong>. We will reply promptly.
+                      </p>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-300 block">Email Address *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={contactData.email}
-                        onChange={handleContactChange}
-                        placeholder="name@company.com"
-                        className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
-                          contactErrors.email ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
-                        } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
-                      />
-                      {contactErrors.email && <p className="text-xs text-red-400">{contactErrors.email}</p>}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-300 block">Phone Number (optional)</label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={contactData.phone}
-                        onChange={handleContactChange}
-                        placeholder="e.g. 587-000-0000"
-                        className="w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border border-white/15 focus:border-[#D4AF37] text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-300 block">Subject</label>
-                      <select
-                        name="subject"
-                        value={contactData.subject}
-                        onChange={handleContactChange}
-                        className="w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border border-white/15 focus:border-[#D4AF37] text-white text-base sm:text-sm focus:outline-none"
+                    {submittedContactData?.needsActivation && (
+                      <div className="max-w-md mx-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-left space-y-1">
+                        <p className="font-bold flex items-center gap-1.5">
+                          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>Action Required on {BUSINESS_INFO.email}:</span>
+                        </p>
+                        <p className="text-amber-200/90 leading-relaxed">
+                          FormSubmit has sent a 1-time activation email to <strong>{BUSINESS_INFO.email}</strong>. Please check your inbox (or Spam folder) and click <em>"Activate Form"</em> to permanently enable direct email delivery.
+                        </p>
+                      </div>
+                    )}
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                      {submittedContactData?.mailtoUrl && (
+                        <a
+                          href={submittedContactData.mailtoUrl}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs min-h-[42px]"
+                        >
+                          <Mail className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Open Direct Email Draft</span>
+                        </a>
+                      )}
+                      <a
+                        href={BUSINESS_INFO.phoneTel}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs shadow-md"
                       >
-                        <option value="Transportation Inquiry">Transportation Inquiry</option>
-                        <option value="Hotshot Delivery Service Request">Hotshot Delivery Service Request</option>
-                        <option value="Urgent Dispatch Request">Urgent Dispatch Request</option>
-                        <option value="General Question">General Question</option>
-                      </select>
+                        <Phone className="w-4 h-4" />
+                        <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setContactSuccess(false)}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Send Another Message</span>
+                      </button>
                     </div>
                   </div>
+                ) : (
+                  <>
+                    <h3 className="text-xl font-bold text-white mb-1">Send Us a Direct Message</h3>
+                    <p className="text-xs text-gray-400 mb-6">Submitted directly to Brothers Hotshot Services dispatch.</p>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-300 block">Message *</label>
-                    <textarea
-                      name="message"
-                      rows={4}
-                      value={contactData.message}
-                      onChange={handleContactChange}
-                      placeholder="How can Brothers Hotshot Services assist your freight needs?..."
-                      className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
-                        contactErrors.message ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
-                      } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
-                    />
-                    {contactErrors.message && <p className="text-xs text-red-400">{contactErrors.message}</p>}
-                  </div>
+                    {contactSubmitError && (
+                      <div className="mb-4 p-3.5 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200 text-xs space-y-1.5">
+                        <p className="font-bold flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                          <span>Online submission issue: {contactSubmitError}</span>
+                        </p>
+                      </div>
+                    )}
 
-                  <button
-                    type="submit"
-                    className="w-full py-4 px-6 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer min-h-[48px] flex items-center justify-center gap-2"
-                  >
-                    <Send className="w-5 h-5 text-[#0B0B0D]" />
-                    <span>Prepare Email Message</span>
-                  </button>
-                </form>
+                    <form onSubmit={handleContactSubmit} className="space-y-4" noValidate>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-300 block">Your Name *</label>
+                          <input
+                            type="text"
+                            name="name"
+                            disabled={isContactSubmitting}
+                            value={contactData.name}
+                            onChange={handleContactChange}
+                            placeholder="e.g. David Miller"
+                            className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
+                              contactErrors.name ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
+                            } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
+                          />
+                          {contactErrors.name && <p className="text-xs text-red-400">{contactErrors.name}</p>}
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-300 block">Email Address *</label>
+                          <input
+                            type="email"
+                            name="email"
+                            disabled={isContactSubmitting}
+                            value={contactData.email}
+                            onChange={handleContactChange}
+                            placeholder="name@company.com"
+                            className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
+                              contactErrors.email ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
+                            } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
+                          />
+                          {contactErrors.email && <p className="text-xs text-red-400">{contactErrors.email}</p>}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-300 block">Phone Number (optional)</label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            disabled={isContactSubmitting}
+                            value={contactData.phone}
+                            onChange={handleContactChange}
+                            placeholder="e.g. 587-000-0000"
+                            className="w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border border-white/15 focus:border-[#D4AF37] text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-semibold text-gray-300 block">Subject</label>
+                          <select
+                            name="subject"
+                            disabled={isContactSubmitting}
+                            value={contactData.subject}
+                            onChange={handleContactChange}
+                            className="w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border border-white/15 focus:border-[#D4AF37] text-white text-base sm:text-sm focus:outline-none"
+                          >
+                            <option value="Transportation Inquiry">Transportation Inquiry</option>
+                            <option value="Hotshot Delivery Service Request">Hotshot Delivery Service Request</option>
+                            <option value="Urgent Dispatch Request">Urgent Dispatch Request</option>
+                            <option value="General Question">General Question</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-gray-300 block">Message *</label>
+                        <textarea
+                          name="message"
+                          rows={4}
+                          disabled={isContactSubmitting}
+                          value={contactData.message}
+                          onChange={handleContactChange}
+                          placeholder="How can Brothers Hotshot Services assist your freight needs?..."
+                          className={`w-full px-3.5 sm:px-4 py-3 rounded-xl bg-black/60 border ${
+                            contactErrors.message ? 'border-red-500' : 'border-white/15 focus:border-[#D4AF37]'
+                          } text-white placeholder-gray-500 text-base sm:text-sm focus:outline-none`}
+                        />
+                        {contactErrors.message && <p className="text-xs text-red-400">{contactErrors.message}</p>}
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isContactSubmitting}
+                        className="w-full py-4 px-6 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-sm sm:text-base tracking-wide shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer min-h-[50px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isContactSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin text-[#0B0B0D]" />
+                            <span>Sending Message...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-5 h-5 text-[#0B0B0D]" />
+                            <span>Send Message Online</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1618,9 +2412,11 @@ ${contactData.message.trim()}
         recipient={BUSINESS_INFO.email}
         subject={modalState.subject}
         body={modalState.body}
+        htmlBody={modalState.htmlBody}
         mailtoUrl={modalState.mailtoUrl}
         selectedFile={modalState.selectedFile}
         isJobApplication={modalState.isJobApplication}
+        quoteDetails={modalState.quoteDetails}
       />
 
       {/* Official Brothers Hotshot Flyer Modal */}
