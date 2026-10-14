@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import EmailClientModal from '../components/EmailClientModal';
-import { formatDriverApplication } from '../utils/emailFormatters';
+import { formatDriverApplication, openEmailAppOrWebmail } from '../utils/emailFormatters';
 import { submitCareerForm } from '../services/formSubmissionService';
 
 export default function CareersPage() {
@@ -255,23 +255,28 @@ export default function CareersPage() {
                   <Phone className="w-4 h-4" />
                   <span>Call Recruitment: {BUSINESS_INFO.phone}</span>
                 </a>
-                {preparedEmail.mailtoUrl && (
-                  <a
-                    href={preparedEmail.mailtoUrl}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
-                  >
-                    <Mail className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Open Direct Email Draft</span>
-                  </a>
-                )}
                 <button
                   type="button"
                   onClick={() => setSubmitSuccess(false)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Submit Another Application</span>
                 </button>
+                {submittedData && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const formatted = formatDriverApplication(submittedData, resumeFile);
+                      openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
+                    }}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                    title="Open a copy in Gmail Web or your email app"
+                  >
+                    <Mail className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Open in Gmail / Email App</span>
+                  </button>
+                )}
               </div>
             </div>
           ) : (

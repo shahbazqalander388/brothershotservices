@@ -35,7 +35,8 @@ import DeliveryServicesSection from '../components/DeliveryServicesSection';
 import { 
   formatQuoteInquiry, 
   formatContactInquiry, 
-  formatDriverApplication 
+  formatDriverApplication,
+  openEmailAppOrWebmail
 } from '../utils/emailFormatters';
 import { submitQuoteForm, submitContactForm, submitCareerForm } from '../services/formSubmissionService';
 
@@ -1525,23 +1526,28 @@ export default function HomePage() {
                   <Phone className="w-4 h-4" />
                   <span>Call Recruitment: {BUSINESS_INFO.phone}</span>
                 </a>
-                {submittedCareerData?.mailtoUrl && (
-                  <a
-                    href={submittedCareerData.mailtoUrl}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
-                  >
-                    <Mail className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Open Direct Email Draft</span>
-                  </a>
-                )}
                 <button
                   type="button"
                   onClick={() => setCareerSuccess(false)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Submit Another Application</span>
                 </button>
+                {submittedCareerData && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const formatted = formatDriverApplication(submittedCareerData, resumeFile);
+                      openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
+                    }}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                    title="Open a copy in Gmail Web or your email app"
+                  >
+                    <Mail className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Open in Gmail / Email App</span>
+                  </button>
+                )}
               </div>
             </div>
           ) : (
@@ -1910,23 +1916,28 @@ export default function HomePage() {
                     <Phone className="w-4 h-4" />
                     <span>Urgent Dispatch: {BUSINESS_INFO.phone}</span>
                   </a>
-                  {submittedQuoteData?.mailtoUrl && (
-                    <a
-                      href={submittedQuoteData.mailtoUrl}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px]"
-                    >
-                      <Mail className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Open Direct Email Draft</span>
-                    </a>
-                  )}
                   <button
                     type="button"
                     onClick={() => setQuoteSuccess(false)}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs sm:text-sm min-h-[46px] cursor-pointer"
                   >
                     <RotateCcw className="w-4 h-4" />
                     <span>Submit Another Request</span>
                   </button>
+                  {submittedQuoteData && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const formatted = formatQuoteInquiry(submittedQuoteData);
+                        openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
+                      }}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
+                      title="Open a copy in Gmail Web or your email app"
+                    >
+                      <Mail className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Open in Gmail / Email App</span>
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -2255,15 +2266,6 @@ export default function HomePage() {
                     </div>
 
                     <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                      {submittedContactData?.mailtoUrl && (
-                        <a
-                          href={submittedContactData.mailtoUrl}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs min-h-[42px]"
-                        >
-                          <Mail className="w-4 h-4 text-[#D4AF37]" />
-                          <span>Open Direct Email Draft</span>
-                        </a>
-                      )}
                       <a
                         href={BUSINESS_INFO.phoneTel}
                         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gold-gradient text-[#0B0B0D] font-extrabold text-xs shadow-md"
@@ -2274,11 +2276,25 @@ export default function HomePage() {
                       <button
                         type="button"
                         onClick={() => setContactSuccess(false)}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs cursor-pointer"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs cursor-pointer min-h-[42px]"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Send Another Message</span>
                       </button>
+                      {submittedContactData && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const formatted = formatContactInquiry(submittedContactData);
+                            openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
+                          }}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs cursor-pointer min-h-[42px]"
+                          title="Open a copy in Gmail Web or your email app"
+                        >
+                          <Mail className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Open in Gmail / Email App</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ) : (

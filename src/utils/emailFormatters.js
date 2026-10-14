@@ -176,12 +176,14 @@ ${escapeHtml(additionalDetails)}
 </html>`;
 
   const mailtoUrl = generateMailtoUrl(BUSINESS_INFO.email, subject, plainText);
+  const gmailUrl = getGmailComposeUrl(BUSINESS_INFO.email, subject, plainText);
 
   return {
     subject,
     plainText,
     html,
     mailtoUrl,
+    gmailUrl,
   };
 }
 
@@ -263,12 +265,14 @@ export function formatContactInquiry(data) {
 </html>`;
 
   const mailtoUrl = generateMailtoUrl(BUSINESS_INFO.email, subject, plainText);
+  const gmailUrl = getGmailComposeUrl(BUSINESS_INFO.email, subject, plainText);
 
   return {
     subject,
     plainText,
     html,
     mailtoUrl,
+    gmailUrl,
   };
 }
 
@@ -378,13 +382,34 @@ export function formatDriverApplication(data, resumeFile) {
 </html>`;
 
   const mailtoUrl = generateMailtoUrl(BUSINESS_INFO.email, subject, plainText);
+  const gmailUrl = getGmailComposeUrl(BUSINESS_INFO.email, subject, plainText);
 
   return {
     subject,
     plainText,
     html,
     mailtoUrl,
+    gmailUrl,
   };
+}
+
+/**
+ * Generates a direct webmail URL for Gmail compose (works in all desktop browsers without needing an installed mail client).
+ */
+export function getGmailComposeUrl(to, subject, body) {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/**
+ * Smart helper: Opens Gmail Web in a new tab on desktop PC, or native mail app on mobile.
+ */
+export function openEmailAppOrWebmail(to, subject, body) {
+  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  if (isMobile) {
+    window.location.href = generateMailtoUrl(to, subject, body);
+  } else {
+    window.open(getGmailComposeUrl(to, subject, body), '_blank', 'noopener,noreferrer');
+  }
 }
 
 /**

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import EmailClientModal from '../components/EmailClientModal';
-import { formatContactInquiry } from '../utils/emailFormatters';
+import { formatContactInquiry, openEmailAppOrWebmail } from '../utils/emailFormatters';
 import { submitContactForm } from '../services/formSubmissionService';
 
 export default function ContactPage() {
@@ -247,23 +247,28 @@ export default function ContactPage() {
                         <Phone className="w-4 h-4" />
                         <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
                       </a>
-                      {submittedData?.mailtoUrl && (
-                        <a
-                          href={submittedData.mailtoUrl}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs min-h-[42px]"
-                        >
-                          <Mail className="w-4 h-4 text-[#D4AF37]" />
-                          <span>Open Direct Email Draft</span>
-                        </a>
-                      )}
                       <button
                         type="button"
                         onClick={() => setSubmitSuccess(false)}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-xs cursor-pointer"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs min-h-[42px] cursor-pointer"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Send Another Message</span>
                       </button>
+                      {submittedData && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const formatted = formatContactInquiry(submittedData);
+                            openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
+                          }}
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs min-h-[42px] cursor-pointer"
+                          title="Open a copy in Gmail Web or your email app"
+                        >
+                          <Mail className="w-4 h-4 text-[#D4AF37]" />
+                          <span>Open in Gmail / Email App</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ) : (
