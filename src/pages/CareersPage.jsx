@@ -168,6 +168,7 @@ export default function CareersPage() {
         consent: false,
       });
       setResumeFile(null);
+      window.scrollTo({ top: 180, behavior: 'smooth' });
     } else {
       setSubmitError(res.error || 'Failed to submit driver application online.');
       setIsModalOpen(true);

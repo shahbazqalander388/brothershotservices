@@ -191,6 +191,18 @@ export default function HomePage() {
         dimensionsWeight: '',
         additionalDetails: '',
       });
+      setTimeout(() => {
+        const elem = document.getElementById('quote');
+        if (elem) {
+          const headerOffset = 90;
+          const elementPosition = elem.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 50);
     } else {
       setQuoteSubmitError(res.error || 'Failed to submit quote inquiry online.');
       setModalState({
@@ -291,6 +303,19 @@ export default function HomePage() {
         consent: false,
       });
       setResumeFile(null);
+      // Keep viewport firmly focused on the careers confirmation card and prevent dropping into #quote
+      setTimeout(() => {
+        const elem = document.getElementById('careers');
+        if (elem) {
+          const headerOffset = 90;
+          const elementPosition = elem.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 50);
     } else {
       setCareerSubmitError(res.error || 'Failed to submit driver application online.');
       setModalState({
@@ -351,6 +376,18 @@ export default function HomePage() {
         subject: 'Transportation Inquiry',
         message: '',
       });
+      setTimeout(() => {
+        const elem = document.getElementById('contact');
+        if (elem) {
+          const headerOffset = 90;
+          const elementPosition = elem.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 50);
     } else {
       setContactSubmitError(res.error || 'Failed to submit message online.');
       setModalState({
