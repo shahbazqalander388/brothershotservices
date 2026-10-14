@@ -36,6 +36,8 @@ export const BUSINESS_INFO = {
   logoUrl: "/logo.jpg",
   cloudinaryLogo:
     "https://res.cloudinary.com/dai2g47e4/image/upload/v1791539190/WhatsApp_Image_2026-10-09_at_5.33.01_AM_kldvsw.jpg",
+  web3FormsAccessKey: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE",
+  web3FormsEndpoint: "https://api.web3forms.com/submit",
 };
 
 export const HOTSHOT_CAPABILITIES = [

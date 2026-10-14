@@ -10,13 +10,10 @@ import {
   Loader2, 
   Calendar, 
   Truck, 
-  RotateCcw,
-  Mail 
+  RotateCcw
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
-import EmailClientModal from '../components/EmailClientModal';
-import { formatQuoteInquiry, openEmailAppOrWebmail } from '../utils/emailFormatters';
-import { submitQuoteForm } from '../services/formSubmissionService';
+import { submitQuoteForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
 
 export default function QuotePage() {
   const [searchParams] = useSearchParams();
@@ -48,14 +45,6 @@ export default function QuotePage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
   const [submitError, setSubmitError] = useState('');
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [preparedEmail, setPreparedEmail] = useState({
-    subject: '',
-    body: '',
-    htmlBody: '',
-    mailtoUrl: '',
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -89,18 +78,10 @@ export default function QuotePage() {
     setIsSubmitting(true);
     setSubmitError('');
 
-    // Submit directly as a real webform via AJAX
+    // Submit directly as a real webform via Web3Forms
     const res = await submitQuoteForm(formData);
 
     setIsSubmitting(false);
-
-    const formatted = formatQuoteInquiry(formData);
-    setPreparedEmail({
-      subject: formatted.subject,
-      body: formatted.plainText,
-      htmlBody: formatted.html,
-      mailtoUrl: formatted.mailtoUrl,
-    });
 
     if (res.success) {
       setSubmittedData({ ...formData });
@@ -119,7 +100,7 @@ export default function QuotePage() {
       // Scroll to form header area
       window.scrollTo({ top: 220, behavior: 'smooth' });
     } else {
-      setSubmitError(res.error || 'Failed to submit quote inquiry. Please try again or call dispatch.');
+      setSubmitError(res.error || 'Failed to submit quote inquiry. Please try again or call dispatch directly.');
     }
   };
 
@@ -237,24 +218,14 @@ export default function QuotePage() {
                         <RotateCcw className="w-4 h-4" />
                         <span>Submit Another Request</span>
                       </button>
-                      {submittedData && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const formatted = formatQuoteInquiry(submittedData);
-                            openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
-                          }}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
-                          title="Open a copy in Gmail Web or your email app"
-                        >
-                          <Mail className="w-4 h-4 text-[#D4AF37]" />
-                          <span>Open in Gmail / Email App</span>
-                        </button>
-                      )}
                     </div>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" noValidate>
+                    {/* Web3Forms Hidden Access Key & Honeypot */}
+                    <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                    <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+
                   {/* Contact Information */}
                   <div className="space-y-4 sm:space-y-5">
                     <h2 className="text-base sm:text-lg font-bold text-white border-b border-white/10 pb-2">
@@ -469,13 +440,6 @@ export default function QuotePage() {
                           <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
                           <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
                         </a>
-                        <button
-                          type="button"
-                          onClick={() => setIsModalOpen(true)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white font-semibold text-xs hover:bg-white/15 cursor-pointer"
-                        >
-                          <span>Open Email Client Backup</span>
-                        </button>
                       </div>
                     </div>
                   )}
@@ -569,21 +533,6 @@ export default function QuotePage() {
           </div>
         </div>
       </section>
-
-      {/* Confirmation Modal */}
-      <EmailClientModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Ready to Send Quote Inquiry"
-        recipient={BUSINESS_INFO.email}
-        subject={preparedEmail.subject}
-        body={preparedEmail.body}
-        htmlBody={preparedEmail.htmlBody}
-        mailtoUrl={preparedEmail.mailtoUrl}
-        selectedFile={null}
-        isJobApplication={false}
-        quoteDetails={formData}
-      />
     </div>
   );
 }

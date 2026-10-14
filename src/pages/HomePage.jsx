@@ -24,21 +24,13 @@ import {
   Camera,
   Loader2,
   Calendar,
-  RotateCcw,
-  Mail
+  RotateCcw
 } from 'lucide-react';
 import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
-import EmailClientModal from '../components/EmailClientModal';
 import DeliveryServicesSection from '../components/DeliveryServicesSection';
-import { 
-  formatQuoteInquiry, 
-  formatContactInquiry, 
-  formatDriverApplication,
-  openEmailAppOrWebmail
-} from '../utils/emailFormatters';
-import { submitQuoteForm, submitContactForm, submitCareerForm } from '../services/formSubmissionService';
+import { submitQuoteForm, submitContactForm, submitCareerForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
 
 const iconMap = {
   Truck: Truck,
@@ -73,19 +65,6 @@ export default function HomePage() {
       document.body.style.overflow = '';
     };
   }, [showBrandModal, lightboxImage]);
-
-  // Modal State for Email Client
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    title: '',
-    subject: '',
-    body: '',
-    htmlBody: '',
-    mailtoUrl: '',
-    selectedFile: null,
-    isJobApplication: false,
-    quoteDetails: null,
-  });
 
   // Quote Form State
   const [quoteData, setQuoteData] = useState({
@@ -168,18 +147,13 @@ export default function HomePage() {
     setIsQuoteSubmitting(true);
     setQuoteSubmitError('');
 
-    // Direct Webform submission via AJAX
+    // Direct Webform submission via Web3Forms
     const res = await submitQuoteForm(quoteData);
 
     setIsQuoteSubmitting(false);
 
-    const formatted = formatQuoteInquiry(quoteData);
-
     if (res.success) {
-      setSubmittedQuoteData({
-        ...quoteData,
-        mailtoUrl: formatted.mailtoUrl,
-      });
+      setSubmittedQuoteData({ ...quoteData });
       setQuoteSuccess(true);
       setQuoteData({
         customerName: '',
@@ -205,18 +179,7 @@ export default function HomePage() {
         }
       }, 50);
     } else {
-      setQuoteSubmitError(res.error || 'Failed to submit quote inquiry online.');
-      setModalState({
-        isOpen: true,
-        title: 'Open Email Client Backup',
-        subject: formatted.subject,
-        body: formatted.plainText,
-        htmlBody: formatted.html,
-        mailtoUrl: formatted.mailtoUrl,
-        selectedFile: null,
-        isJobApplication: false,
-        quoteDetails: quoteData,
-      });
+      setQuoteSubmitError(res.error || 'Failed to submit quote inquiry online. Please try again or call dispatch directly.');
     }
   };
 
@@ -276,18 +239,16 @@ export default function HomePage() {
     setIsCareerSubmitting(true);
     setCareerSubmitError('');
 
+    // Direct Webform submission via Web3Forms
     const res = await submitCareerForm(careerData, resumeFile);
 
     setIsCareerSubmitting(false);
-
-    const formatted = formatDriverApplication(careerData, resumeFile);
 
     if (res.success) {
       setSubmittedCareerData({
         ...careerData,
         resumeFileName: resumeFile ? resumeFile.name : 'Attached Resume',
         fileSize: resumeFile ? (resumeFile.size / 1024).toFixed(1) : '',
-        mailtoUrl: formatted.mailtoUrl,
       });
       setCareerSuccess(true);
       setCareerData({
@@ -318,18 +279,7 @@ export default function HomePage() {
         }
       }, 50);
     } else {
-      setCareerSubmitError(res.error || 'Failed to submit driver application online.');
-      setModalState({
-        isOpen: true,
-        title: 'Open Email Client Backup',
-        subject: formatted.subject,
-        body: formatted.plainText,
-        htmlBody: formatted.html,
-        mailtoUrl: formatted.mailtoUrl,
-        selectedFile: resumeFile,
-        isJobApplication: true,
-        quoteDetails: null,
-      });
+      setCareerSubmitError(res.error || 'Failed to submit driver application online. Please try again or call recruitment directly.');
     }
   };
 
@@ -358,17 +308,13 @@ export default function HomePage() {
     setIsContactSubmitting(true);
     setContactSubmitError('');
 
+    // Direct Webform submission via Web3Forms
     const res = await submitContactForm(contactData);
 
     setIsContactSubmitting(false);
 
-    const formatted = formatContactInquiry(contactData);
-
     if (res.success) {
-      setSubmittedContactData({
-        ...contactData,
-        mailtoUrl: formatted.mailtoUrl,
-      });
+      setSubmittedContactData({ ...contactData });
       setContactSuccess(true);
       setContactData({
         name: '',
@@ -390,18 +336,7 @@ export default function HomePage() {
         }
       }, 50);
     } else {
-      setContactSubmitError(res.error || 'Failed to submit message online.');
-      setModalState({
-        isOpen: true,
-        title: 'Open Email Client Backup',
-        subject: formatted.subject,
-        body: formatted.plainText,
-        htmlBody: formatted.html,
-        mailtoUrl: formatted.mailtoUrl,
-        selectedFile: null,
-        isJobApplication: false,
-        quoteDetails: null,
-      });
+      setContactSubmitError(res.error || 'Failed to submit message online. Please try again or call dispatch directly.');
     }
   };
 
@@ -1534,20 +1469,6 @@ export default function HomePage() {
                   <RotateCcw className="w-4 h-4" />
                   <span>Submit Another Application</span>
                 </button>
-                {submittedCareerData && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const formatted = formatDriverApplication(submittedCareerData, resumeFile);
-                      openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
-                    }}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
-                    title="Open a copy in Gmail Web or your email app"
-                  >
-                    <Mail className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Open in Gmail / Email App</span>
-                  </button>
-                )}
               </div>
             </div>
           ) : (
@@ -1569,12 +1490,24 @@ export default function HomePage() {
                     <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                     <span>Online Submission Issue: {careerSubmitError}</span>
                   </p>
+                  <div className="pt-1">
+                    <a
+                      href={BUSINESS_INFO.phoneTel}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 text-white font-bold text-xs hover:bg-red-500/30"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Call Recruitment: {BUSINESS_INFO.phone}</span>
+                    </a>
+                  </div>
                 </div>
               )}
 
               {/* Careers Form */}
               <div className="rounded-2xl bg-[#131317] border border-white/10 p-5 sm:p-8 lg:p-10 shadow-2xl">
                 <form onSubmit={handleCareerSubmit} className="space-y-8" noValidate>
+                  {/* Web3Forms Hidden Access Key & Honeypot */}
+                  <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                  <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
               {/* Personal Information */}
               <div className="space-y-4">
                 <h3 className="text-base sm:text-lg font-bold text-white border-b border-white/10 pb-2">
@@ -1924,24 +1857,13 @@ export default function HomePage() {
                     <RotateCcw className="w-4 h-4" />
                     <span>Submit Another Request</span>
                   </button>
-                  {submittedQuoteData && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const formatted = formatQuoteInquiry(submittedQuoteData);
-                        openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
-                      }}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
-                      title="Open a copy in Gmail Web or your email app"
-                    >
-                      <Mail className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Open in Gmail / Email App</span>
-                    </button>
-                  )}
                 </div>
               </div>
             ) : (
               <form onSubmit={handleQuoteSubmit} className="space-y-6" noValidate>
+                {/* Web3Forms Hidden Access Key & Honeypot */}
+                <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-gray-300 block">Customer Name *</label>
@@ -2103,26 +2025,6 @@ export default function HomePage() {
                       <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
                       <span>Call Dispatch: {BUSINESS_INFO.phone}</span>
                     </a>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const formatted = formatQuoteInquiry(quoteData);
-                        setModalState({
-                          isOpen: true,
-                          title: 'Open Email Client Backup',
-                          subject: formatted.subject,
-                          body: formatted.plainText,
-                          htmlBody: formatted.html,
-                          mailtoUrl: formatted.mailtoUrl,
-                          selectedFile: null,
-                          isJobApplication: false,
-                          quoteDetails: quoteData,
-                        });
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white font-semibold text-xs hover:bg-white/15 cursor-pointer"
-                    >
-                      <span>Open Email Client Backup</span>
-                    </button>
                   </div>
                 </div>
               )}
@@ -2281,20 +2183,6 @@ export default function HomePage() {
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Send Another Message</span>
                       </button>
-                      {submittedContactData && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const formatted = formatContactInquiry(submittedContactData);
-                            openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
-                          }}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs cursor-pointer min-h-[42px]"
-                          title="Open a copy in Gmail Web or your email app"
-                        >
-                          <Mail className="w-4 h-4 text-[#D4AF37]" />
-                          <span>Open in Gmail / Email App</span>
-                        </button>
-                      )}
                     </div>
                   </div>
                 ) : (
@@ -2312,6 +2200,9 @@ export default function HomePage() {
                     )}
 
                     <form onSubmit={handleContactSubmit} className="space-y-4" noValidate>
+                      {/* Web3Forms Hidden Access Key & Honeypot */}
+                      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                      <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1">
                           <label className="text-xs font-semibold text-gray-300 block">Your Name *</label>
@@ -2418,21 +2309,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Shared Email Client Modal */}
-      <EmailClientModal
-        isOpen={modalState.isOpen}
-        onClose={() => setModalState((prev) => ({ ...prev, isOpen: false }))}
-        title={modalState.title}
-        recipient={BUSINESS_INFO.email}
-        subject={modalState.subject}
-        body={modalState.body}
-        htmlBody={modalState.htmlBody}
-        mailtoUrl={modalState.mailtoUrl}
-        selectedFile={modalState.selectedFile}
-        isJobApplication={modalState.isJobApplication}
-        quoteDetails={modalState.quoteDetails}
-      />
 
       {/* Official Brothers Hotshot Flyer Modal */}
       {showBrandModal && (

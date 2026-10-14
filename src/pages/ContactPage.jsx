@@ -11,9 +11,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
-import EmailClientModal from '../components/EmailClientModal';
-import { formatContactInquiry, openEmailAppOrWebmail } from '../utils/emailFormatters';
-import { submitContactForm } from '../services/formSubmissionService';
+import { submitContactForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -29,14 +27,6 @@ export default function ContactPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
   const [submitError, setSubmitError] = useState('');
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [preparedEmail, setPreparedEmail] = useState({
-    subject: '',
-    body: '',
-    htmlBody: '',
-    mailtoUrl: '',
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,23 +58,13 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitError('');
 
+    // Submit directly as a real webform via Web3Forms
     const res = await submitContactForm(formData);
 
     setIsSubmitting(false);
 
-    const formatted = formatContactInquiry(formData);
-    setPreparedEmail({
-      subject: formatted.subject,
-      body: formatted.plainText,
-      htmlBody: formatted.html,
-      mailtoUrl: formatted.mailtoUrl,
-    });
-
     if (res.success) {
-      setSubmittedData({
-        ...formData,
-        mailtoUrl: formatted.mailtoUrl,
-      });
+      setSubmittedData({ ...formData });
       setSubmitSuccess(true);
       setFormData({
         name: '',
@@ -95,7 +75,7 @@ export default function ContactPage() {
       });
       window.scrollTo({ top: 200, behavior: 'smooth' });
     } else {
-      setSubmitError(res.error || 'Failed to submit contact message.');
+      setSubmitError(res.error || 'Failed to submit contact message. Please try again or call dispatch directly.');
     }
   };
 
@@ -255,20 +235,6 @@ export default function ContactPage() {
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Send Another Message</span>
                       </button>
-                      {submittedData && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const formatted = formatContactInquiry(submittedData);
-                            openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
-                          }}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs min-h-[42px] cursor-pointer"
-                          title="Open a copy in Gmail Web or your email app"
-                        >
-                          <Mail className="w-4 h-4 text-[#D4AF37]" />
-                          <span>Open in Gmail / Email App</span>
-                        </button>
-                      )}
                     </div>
                   </div>
                 ) : (
@@ -292,6 +258,9 @@ export default function ContactPage() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" noValidate>
+                      {/* Web3Forms Hidden Access Key & Honeypot */}
+                      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                      <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     {/* Name */}
                     <div className="space-y-1.5">
@@ -425,19 +394,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-
-      {/* Confirmation Modal */}
-      <EmailClientModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Ready to Send Message"
-        recipient={BUSINESS_INFO.email}
-        subject={preparedEmail.subject}
-        body={preparedEmail.body}
-        htmlBody={preparedEmail.htmlBody}
-        mailtoUrl={preparedEmail.mailtoUrl}
-        isJobApplication={false}
-      />
     </div>
   );
 }

@@ -1,17 +1,27 @@
 import { BUSINESS_INFO } from '../data/businessInfo';
 
 /**
- * Service to submit web forms directly from the browser (like a real webform).
- * Submits asynchronously via AJAX to the webform endpoint.
- * Default provider: FormSubmit.co (free, zero-config, sends structured HTML table emails with reply-to).
- * Supports custom endpoint override via VITE_FORM_ENDPOINT if configured.
+ * Service to submit web forms directly from the browser using Web3Forms.
+ * Submits asynchronously via AJAX (fetch) to https://api.web3forms.com/submit
+ * Form submissions are delivered directly to info.brothershotshot@gmail.com.
+ * Requires a hidden access_key field (configured via VITE_WEB3FORMS_ACCESS_KEY or fallback).
  */
 
-export const submitQuoteForm = async (data) => {
-  const endpoint =
-    import.meta.env.VITE_FORM_ENDPOINT ||
-    `https://formsubmit.co/ajax/${BUSINESS_INFO.email}`;
+export const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 
+export const WEB3FORMS_ACCESS_KEY =
+  import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ||
+  BUSINESS_INFO.web3FormsAccessKey ||
+  'YOUR_ACCESS_KEY_HERE';
+
+export const FORM_ENDPOINT =
+  import.meta.env.VITE_FORM_ENDPOINT ||
+  WEB3FORMS_ENDPOINT;
+
+/**
+ * Submit Quote Request Form directly via Web3Forms
+ */
+export const submitQuoteForm = async (data) => {
   const submissionDate = new Date().toLocaleString('en-CA', {
     dateStyle: 'full',
     timeStyle: 'short',
@@ -19,64 +29,62 @@ export const submitQuoteForm = async (data) => {
   });
 
   const payload = {
-    _subject: `Transportation Quote Request: ${data.loadType} - ${data.customerName.trim()}`,
-    _template: 'table',
-    _captcha: 'false',
-    _replyto: data.email.trim(),
+    access_key: WEB3FORMS_ACCESS_KEY,
+    subject: `Transportation Quote Request: ${data.loadType} - ${data.customerName.trim()}`,
+    from_name: data.customerName.trim(),
+    replyto: data.email.trim(),
+    botcheck: false,
     'Customer Name': data.customerName.trim(),
     'Email Address': data.email.trim(),
     'Phone Number': data.phone.trim(),
     'Pickup Location': data.pickupLocation.trim(),
     'Delivery Location': data.deliveryLocation.trim(),
     'Preferred Pickup Date': data.pickupDate || 'Earliest Available',
-    'Load Type': data.loadType,
-    'Dimensions & Approximate Weight': data.dimensionsWeight ? data.dimensionsWeight.trim() : 'Standard / To Be Confirmed',
-    'Additional Details / Instructions': data.additionalDetails ? data.additionalDetails.trim() : 'None provided',
+    'Service / Load Type': data.loadType,
+    'Dimensions & Weight': data.dimensionsWeight ? data.dimensionsWeight.trim() : 'Standard / To Be Confirmed',
+    'Additional Details / Message': data.additionalDetails ? data.additionalDetails.trim() : 'None provided',
     'Submission Source': 'Brothers Hotshot Online Quote Web Form',
     'Submitted At': `${submissionDate} (Mountain Time)`,
   };
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(FORM_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(12000),
     });
 
     const result = await response.json().catch(() => ({}));
-    const isActivation = Boolean(result.message && result.message.includes('Activation'));
 
-    // FormSubmit returns status 200 with { success: "true" } or activation notice on first run
-    if (response.ok || result.success === 'true' || result.success === true || isActivation) {
+    if (response.ok && (result.success === true || result.success === 'true')) {
       return {
         success: true,
-        message: 'Quote request submitted successfully!',
+        message: result.message || 'Quote request submitted successfully!',
         data: result,
       };
     } else {
       return {
         success: false,
-        error: result.message || 'Unable to submit quote request. Please try again.',
+        error: result.message || 'Unable to submit quote request. Please try again or call dispatch directly.',
       };
     }
   } catch (error) {
-    console.error('Webform submission error:', error);
+    console.error('Web3Forms quote submission error:', error);
     return {
       success: false,
-      error: error.message || 'Network error while submitting quote request.',
+      error: error.message || 'Network error while submitting quote request. Please check your connection or call dispatch.',
     };
   }
 };
 
+/**
+ * Submit Contact / Inquiry Form directly via Web3Forms
+ */
 export const submitContactForm = async (data) => {
-  const endpoint =
-    import.meta.env.VITE_FORM_ENDPOINT ||
-    `https://formsubmit.co/ajax/${BUSINESS_INFO.email}`;
-
   const submissionDate = new Date().toLocaleString('en-CA', {
     dateStyle: 'full',
     timeStyle: 'short',
@@ -84,59 +92,58 @@ export const submitContactForm = async (data) => {
   });
 
   const payload = {
-    _subject: `Transportation Inquiry: ${data.subject || 'General'} - ${data.name.trim()}`,
-    _template: 'table',
-    _captcha: 'false',
-    _replyto: data.email.trim(),
-    'Full Name': data.name.trim(),
+    access_key: WEB3FORMS_ACCESS_KEY,
+    subject: `Transportation Inquiry: ${data.subject || 'General'} - ${data.name.trim()}`,
+    from_name: data.name.trim(),
+    replyto: data.email.trim(),
+    botcheck: false,
+    'Customer Name': data.name.trim(),
     'Email Address': data.email.trim(),
     'Phone Number': data.phone ? data.phone.trim() : 'Not provided',
     'Subject': data.subject || 'General Inquiry',
-    'Message': data.message.trim(),
+    'Message / Inquiry Details': data.message.trim(),
     'Submission Source': 'Brothers Hotshot Online Contact Web Form',
     'Submitted At': `${submissionDate} (Mountain Time)`,
   };
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(FORM_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(12000),
     });
 
     const result = await response.json().catch(() => ({}));
-    const isActivation = Boolean(result.message && result.message.includes('Activation'));
 
-    if (response.ok || result.success === 'true' || result.success === true || isActivation) {
+    if (response.ok && (result.success === true || result.success === 'true')) {
       return {
         success: true,
-        message: 'Message submitted successfully!',
+        message: result.message || 'Message submitted successfully!',
         data: result,
       };
     } else {
       return {
         success: false,
-        error: result.message || 'Unable to submit contact message. Please try again.',
+        error: result.message || 'Unable to submit contact message. Please try again or call dispatch directly.',
       };
     }
   } catch (error) {
-    console.error('Contact submission error:', error);
+    console.error('Web3Forms contact submission error:', error);
     return {
       success: false,
-      error: error.message || 'Network error while submitting contact message.',
+      error: error.message || 'Network error while submitting contact message. Please check your connection or call dispatch.',
     };
   }
 };
 
+/**
+ * Submit Driver Application / Career Form directly via Web3Forms
+ */
 export const submitCareerForm = async (data, file) => {
-  const endpoint =
-    import.meta.env.VITE_FORM_ENDPOINT ||
-    `https://formsubmit.co/ajax/${BUSINESS_INFO.email}`;
-
   const submissionDate = new Date().toLocaleString('en-CA', {
     dateStyle: 'full',
     timeStyle: 'short',
@@ -144,10 +151,10 @@ export const submitCareerForm = async (data, file) => {
   });
 
   const formData = new FormData();
-  formData.append('_subject', `Driver Job Application: ${data.position} - ${data.fullName.trim()}`);
-  formData.append('_template', 'table');
-  formData.append('_captcha', 'false');
-  formData.append('_replyto', data.email.trim());
+  formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+  formData.append('subject', `Driver Job Application: ${data.position} - ${data.fullName.trim()}`);
+  formData.append('from_name', data.fullName.trim());
+  formData.append('replyto', data.email.trim());
   formData.append('Applicant Full Name', data.fullName.trim());
   formData.append('Email Address', data.email.trim());
   formData.append('Phone Number', data.phone.trim());
@@ -167,35 +174,34 @@ export const submitCareerForm = async (data, file) => {
   }
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(FORM_ENDPOINT, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
       },
       body: formData,
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
 
     const result = await response.json().catch(() => ({}));
-    const isActivation = Boolean(result.message && result.message.includes('Activation'));
 
-    if (response.ok || result.success === 'true' || result.success === true || isActivation) {
+    if (response.ok && (result.success === true || result.success === 'true')) {
       return {
         success: true,
-        message: 'Driver application submitted successfully!',
+        message: result.message || 'Driver application submitted successfully!',
         data: result,
       };
     } else {
       return {
         success: false,
-        error: result.message || 'Unable to submit application online. Please try again.',
+        error: result.message || 'Unable to submit application online. Please try again or call recruitment directly.',
       };
     }
   } catch (error) {
-    console.error('Career submission error:', error);
+    console.error('Web3Forms career submission error:', error);
     return {
       success: false,
-      error: error.message || 'Network error while submitting driver application.',
+      error: error.message || 'Network error while submitting driver application. Please check your connection or call recruitment.',
     };
   }
 };

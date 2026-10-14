@@ -7,13 +7,10 @@ import {
   Loader2,
   Send,
   RotateCcw,
-  Phone,
-  Mail
+  Phone
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
-import EmailClientModal from '../components/EmailClientModal';
-import { formatDriverApplication, openEmailAppOrWebmail } from '../utils/emailFormatters';
-import { submitCareerForm } from '../services/formSubmissionService';
+import { submitCareerForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
 
 export default function CareersPage() {
   // Form State
@@ -40,15 +37,6 @@ export default function CareersPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
   const [submitError, setSubmitError] = useState('');
-
-  // Submission / Modal State (Fallback)
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [preparedEmail, setPreparedEmail] = useState({
-    subject: '',
-    body: '',
-    htmlBody: '',
-    mailtoUrl: '',
-  });
 
   const allowedExtensions = ['.pdf', '.doc', '.docx'];
   const maxFileSize = 10 * 1024 * 1024; // 10MB
@@ -124,7 +112,7 @@ export default function CareersPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle Form Submission (Direct Webform via AJAX)
+  // Handle Form Submission (Direct Webform via AJAX with Web3Forms)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -138,14 +126,6 @@ export default function CareersPage() {
     const res = await submitCareerForm(formData, resumeFile);
 
     setIsSubmitting(false);
-
-    const formatted = formatDriverApplication(formData, resumeFile);
-    setPreparedEmail({
-      subject: formatted.subject,
-      body: formatted.plainText,
-      htmlBody: formatted.html,
-      mailtoUrl: formatted.mailtoUrl,
-    });
 
     if (res.success) {
       setSubmittedData({
@@ -170,8 +150,7 @@ export default function CareersPage() {
       setResumeFile(null);
       window.scrollTo({ top: 180, behavior: 'smooth' });
     } else {
-      setSubmitError(res.error || 'Failed to submit driver application online.');
-      setIsModalOpen(true);
+      setSubmitError(res.error || 'Failed to submit driver application online. Please try again or call recruitment directly.');
     }
   };
 
@@ -263,20 +242,6 @@ export default function CareersPage() {
                   <RotateCcw className="w-4 h-4" />
                   <span>Submit Another Application</span>
                 </button>
-                {submittedData && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const formatted = formatDriverApplication(submittedData, resumeFile);
-                      openEmailAppOrWebmail(BUSINESS_INFO.email, formatted.subject, formatted.plainText);
-                    }}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm min-h-[46px] cursor-pointer"
-                    title="Open a copy in Gmail Web or your email app"
-                  >
-                    <Mail className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Open in Gmail / Email App</span>
-                  </button>
-                )}
               </div>
             </div>
           ) : (
@@ -300,19 +265,24 @@ export default function CareersPage() {
                     <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                     <span>Online Submission Issue: {submitError}</span>
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-white font-semibold text-xs hover:bg-white/15 cursor-pointer"
-                  >
-                    <span>Open Email Client Backup</span>
-                  </button>
+                  <div className="pt-1">
+                    <a
+                      href={BUSINESS_INFO.phoneTel}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 text-white font-bold text-xs hover:bg-red-500/30"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Call Recruitment: {BUSINESS_INFO.phone}</span>
+                    </a>
+                  </div>
                 </div>
               )}
 
               {/* Form Card */}
               <div className="rounded-2xl bg-[#131317] border border-white/10 p-4 sm:p-8 lg:p-10 shadow-2xl">
                 <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10" noValidate>
+                  {/* Web3Forms Hidden Access Key & Honeypot */}
+                  <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                  <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
               {/* 1. PERSONAL INFORMATION */}
               <div className="space-y-5 sm:space-y-6">
                 <div className="border-b border-white/10 pb-3 flex flex-wrap items-center justify-between gap-2">
@@ -687,19 +657,6 @@ export default function CareersPage() {
     </div>
   </section>
 
-      {/* Confirmation & Email Client Modal */}
-      <EmailClientModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Send Driver Application by Email"
-        recipient={BUSINESS_INFO.email}
-        subject={preparedEmail.subject}
-        body={preparedEmail.body}
-        htmlBody={preparedEmail.htmlBody}
-        mailtoUrl={preparedEmail.mailtoUrl}
-        selectedFile={resumeFile}
-        isJobApplication={true}
-      />
     </div>
   );
 }
