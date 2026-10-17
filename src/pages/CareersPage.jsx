@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import { submitCareerForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
+import SEO from '../components/SEO';
 
 export default function CareersPage() {
   // Form State
@@ -156,6 +157,11 @@ export default function CareersPage() {
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200 overflow-x-hidden">
+      <SEO 
+        title="Careers & Driver Opportunities | Brothers Hotshot Services"
+        description="Join Brothers Hotshot Services. Hiring professional Class 1 and hotshot drivers across Alberta and Western Canada. Apply online today."
+        canonical="https://brothershotshot.ca/careers"
+      />
       {/* Header */}
       <section className="relative py-12 sm:py-20 bg-[#121216] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

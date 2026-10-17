@@ -3,10 +3,16 @@ import { Link } from 'react-router-dom';
 import { MapPin, Navigation, ArrowRight } from 'lucide-react';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
 import { BUSINESS_INFO } from '../data/businessInfo';
+import SEO from '../components/SEO';
 
 export default function ServiceAreasPage() {
   return (
     <div className="bg-[#0B0B0D] text-gray-200 overflow-x-hidden">
+      <SEO 
+        title="Service Areas Across Western Canada | Alberta, BC, SK, MB Hotshot"
+        description="Dependable hotshot transportation coverage across Alberta (Red Deer, Calgary, Edmonton), British Columbia, Saskatchewan, and Manitoba (including Winnipeg)."
+        canonical="https://brothershotshot.ca/service-areas"
+      />
       {/* Header */}
       <section className="relative py-12 sm:py-20 bg-[#121216] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

@@ -20,6 +20,7 @@ import {
 import { SERVICES } from '../data/servicesData';
 import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
 import DeliveryServicesSection from '../components/DeliveryServicesSection';
+import SEO from '../components/SEO';
 
 const iconMap = {
   Truck: Truck,
@@ -49,6 +50,11 @@ export default function ServicesPage() {
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200">
+      <SEO 
+        title="Hotshot & Delivery Services | Brothers Hotshot Alberta & Western Canada"
+        description="Comprehensive hotshot freight services: heavy-duty gooseneck transport, equipment hauling, urgent emergency deliveries, and industrial parts delivery across AB, BC, SK, MB."
+        canonical="https://brothershotshot.ca/services"
+      />
       {/* Header */}
       <section className="relative py-12 sm:py-20 bg-[#121216] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

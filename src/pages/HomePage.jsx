@@ -30,6 +30,7 @@ import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
 import DeliveryServicesSection from '../components/DeliveryServicesSection';
+import SEO from '../components/SEO';
 import { submitQuoteForm, submitContactForm, submitCareerForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
 
 const iconMap = {
@@ -342,6 +343,11 @@ export default function HomePage() {
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200">
+      <SEO 
+        title="Brothers Hotshot Services | Reliable Hotshot Transportation Across Western Canada"
+        description="Fast, safe, and dependable transportation of equipment, parts, materials, and urgent loads throughout Alberta, Saskatchewan, British Columbia, and Manitoba, including Winnipeg. Based in Red Deer, AB."
+        canonical="https://brothershotshot.ca/"
+      />
       {/* ========================================================
           1. HERO SECTION (FULL LOGO & METALLIC INDUSTRIAL THEME)
       ======================================================== */}

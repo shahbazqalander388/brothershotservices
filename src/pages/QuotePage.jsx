@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import { submitQuoteForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
+import SEO from '../components/SEO';
 
 export default function QuotePage() {
   const [searchParams] = useSearchParams();
@@ -106,6 +107,11 @@ export default function QuotePage() {
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200 overflow-x-hidden">
+      <SEO 
+        title="Request a Hotshot Transportation Quote | Brothers Hotshot Services"
+        description="Get a fast and accurate quote for hotshot trucking, equipment transport, and expedited freight throughout Alberta, BC, Saskatchewan, and Manitoba."
+        canonical="https://brothershotshot.ca/quote"
+      />
       {/* Header */}
       <section className="relative py-12 sm:py-20 bg-[#121216] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

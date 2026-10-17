@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import { submitContactForm, WEB3FORMS_ACCESS_KEY } from '../services/formSubmissionService';
+import SEO from '../components/SEO';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -81,6 +82,11 @@ export default function ContactPage() {
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200 overflow-x-hidden">
+      <SEO 
+        title="Contact Brothers Hotshot Services | 24/7 Red Deer Dispatch: 587-377-0880"
+        description="Call Brothers Hotshot 24/7 at 587-377-0880 or email info.brothershotshot@gmail.com. Based in Red Deer, AB, serving Alberta and Western Canada."
+        canonical="https://brothershotshot.ca/contact"
+      />
       {/* Header */}
       <section className="relative py-12 sm:py-20 bg-[#121216] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

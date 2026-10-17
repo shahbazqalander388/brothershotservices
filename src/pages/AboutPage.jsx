@@ -13,6 +13,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { BUSINESS_INFO, FLEET_IMAGES } from '../data/businessInfo';
+import SEO from '../components/SEO';
 
 export default function AboutPage() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -30,6 +31,11 @@ export default function AboutPage() {
 
   return (
     <div className="bg-[#0B0B0D] text-gray-200">
+      <SEO 
+        title="About Us | Brothers Hotshot Services - Red Deer, AB"
+        description="Learn about Brothers Hotshot Services, based in Red Deer, AB. Dedicated hotshot trucking, equipment transport, and professional cargo delivery across Western Canada."
+        canonical="https://brothershotshot.ca/about"
+      />
       {/* Page Header */}
       <section className="relative py-12 sm:py-20 bg-[#121216] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
