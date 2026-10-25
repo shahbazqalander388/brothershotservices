@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brothers Hotshot Services | Official Barcode &amp; QR Code Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .card-box { border: 1px solid #d1d5db !important; box-shadow: none !important; background: white !important; color: black !important; break-inside: avoid; page-break-inside: avoid; margin-bottom: 1.5rem !important; }
+      .text-white { color: black !important; }
+      .text-gray-400, .text-gray-300 { color: #4b5563 !important; }
+      .bg-\[\#171719\], .bg-\[\#0B0B0D\] { background: #f9fafb !important; }
+    }
+  </style>
+</head>
+<body class="bg-[#0B0B0D] text-gray-100 min-h-screen p-4 md:p-8 font-sans antialiased">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row items-center justify-between border-b border-[#D4AF37]/30 pb-6 mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <!-- Brand Shield -->
+        <div class="w-16 h-16 rounded-xl bg-[#171719] border-2 border-[#D4AF37] flex items-center justify-center shadow-lg shadow-[#D4AF37]/10 flex-shrink-0">
+          <span class="text-2xl font-black tracking-wider text-[#D4AF37]">BH</span>
+        </div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            Brothers Hotshot Services
+          </h1>
+          <p class="text-sm text-[#D4AF37] font-semibold">Official Client Barcode &amp; QR Code Studio</p>
+          <p class="text-xs text-gray-400">5401 48 Ave, Red Deer, AB T4N 3V3 &bull; +1-587-377-0880 &bull; info.brothershotshot@gmail.com</p>
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="flex items-center gap-3 no-print">
+        <button onclick="window.print()" class="px-5 py-2.5 rounded-lg bg-[#171719] border border-[#D4AF37]/60 hover:bg-[#D4AF37] hover:text-black text-xs font-bold text-gray-200 transition flex items-center gap-2 shadow-lg">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Print / Save as PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- Grid of Barcodes -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      
+      <!-- Card 1: Official Website QR Code -->
+      <div class="card-box bg-[#171719] border border-gray-800 hover:border-[#D4AF37]/60 rounded-2xl p-6 transition flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
+              Primary Web QR
+            </span>
+            <span class="text-xs text-gray-400">Scan to Open Website</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">Official Website QR Code</h3>
+          <p class="text-xs text-gray-400 mb-5">Direct URL link to https://brothershotshot.ca/. Ideal for marketing flyers, print advertisements, business cards, and trailer decals.</p>
+          
+          <div class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-inner mb-6">
+            <div id="qr-web-container" class="flex justify-center items-center"></div>
+            <div class="mt-3 text-center">
+              <span class="text-[11px] font-bold tracking-wider text-black block">BROTHERS HOTSHOT SERVICES</span>
+              <span class="text-[9px] text-gray-600 font-medium">brothershotshot.ca &bull; Red Deer, AB</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 no-print">
+          <button onclick="downloadCode('qr-web', 'png', 'Brothers_Hotshot_Website_QR')" class="flex-1 py-2.5 px-3 rounded-lg bg-[#D4AF37] hover:bg-[#e0bc45] text-black font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-[#D4AF37]/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download PNG (HD)
+          </button>
+          <button onclick="downloadCode('qr-web', 'svg', 'Brothers_Hotshot_Website_QR')" class="py-2.5 px-3 rounded-lg bg-[#0B0B0D] hover:bg-gray-900 border border-gray-700 text-gray-200 text-xs font-semibold flex items-center justify-center gap-1 transition">
+            Download SVG
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Digital Contact Card (vCard QR) -->
+      <div class="card-box bg-[#171719] border border-gray-800 hover:border-[#D4AF37]/60 rounded-2xl p-6 transition flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              Smart vCard
+            </span>
+            <span class="text-xs text-gray-400">Scan to Save Contact</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">Company Contact Card (vCard)</h3>
+          <p class="text-xs text-gray-400 mb-5">Instantly saves dispatch telephone (+1-587-377-0880), email, website, and Red Deer office address directly to any iOS or Android device.</p>
+          
+          <div class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-inner mb-6">
+            <div id="qr-vcard-container" class="flex justify-center items-center"></div>
+            <div class="mt-3 text-center">
+              <span class="text-[11px] font-bold tracking-wider text-black block">SAVE CONTACT TO PHONE</span>
+              <span class="text-[9px] text-gray-600 font-medium">+1-587-377-0880 &bull; 24/7 Dispatch</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 no-print">
+          <button onclick="downloadCode('qr-vcard', 'png', 'Brothers_Hotshot_vCard_QR')" class="flex-1 py-2.5 px-3 rounded-lg bg-[#D4AF37] hover:bg-[#e0bc45] text-black font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-[#D4AF37]/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download PNG (HD)
+          </button>
+          <button onclick="downloadCode('qr-vcard', 'svg', 'Brothers_Hotshot_vCard_QR')" class="py-2.5 px-3 rounded-lg bg-[#0B0B0D] hover:bg-gray-900 border border-gray-700 text-gray-200 text-xs font-semibold flex items-center justify-center gap-1 transition">
+            Download SVG
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: 24/7 Dispatch Direct Call QR -->
+      <div class="card-box bg-[#171719] border border-gray-800 hover:border-[#D4AF37]/60 rounded-2xl p-6 transition flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-500/20 text-green-400 border border-green-500/30">
+              Direct Phone Call
+            </span>
+            <span class="text-xs text-gray-400">Scan to Dial Dispatch</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">Emergency 24/7 Dispatch Call</h3>
+          <p class="text-xs text-gray-400 mb-5">Instantly dials 24/7 dispatch line (+1-587-377-0880) upon scanning. Ideal for field equipment, trailer bumpers, and warehouse yards.</p>
+          
+          <div class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-inner mb-6">
+            <div id="qr-call-container" class="flex justify-center items-center"></div>
+            <div class="mt-3 text-center">
+              <span class="text-[11px] font-bold tracking-wider text-black block">CALL 24/7 DISPATCH</span>
+              <span class="text-[9px] text-gray-600 font-medium">tel: +1-587-377-0880</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 no-print">
+          <button onclick="downloadCode('qr-call', 'png', 'Brothers_Hotshot_Dispatch_Call_QR')" class="flex-1 py-2.5 px-3 rounded-lg bg-[#D4AF37] hover:bg-[#e0bc45] text-black font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-[#D4AF37]/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download PNG (HD)
+          </button>
+          <button onclick="downloadCode('qr-call', 'svg', 'Brothers_Hotshot_Dispatch_Call_QR')" class="py-2.5 px-3 rounded-lg bg-[#0B0B0D] hover:bg-gray-900 border border-gray-700 text-gray-200 text-xs font-semibold flex items-center justify-center gap-1 transition">
+            Download SVG
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 4: Linear Barcode (Code-128) -->
+      <div class="card-box bg-[#171719] border border-gray-800 hover:border-[#D4AF37]/60 rounded-2xl p-6 transition flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              1D Code-128
+            </span>
+            <span class="text-xs text-gray-400">Logistics &amp; BOL Tracking</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">Freight Logistics Barcode</h3>
+          <p class="text-xs text-gray-400 mb-5">Standard linear Code-128 barcode for cargo bills of lading (BOL), shipping manifests, warehouse scanner integration, and equipment tracking.</p>
+          
+          <div class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-inner mb-6">
+            <div id="barcode128-container" class="flex justify-center items-center w-full overflow-hidden"></div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-mono font-bold tracking-widest text-black block">BROTHERS-HOTSHOT-CA</span>
+              <span class="text-[9px] text-gray-600 font-medium">Freight &amp; Cargo Identification</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 no-print">
+          <button onclick="downloadCode('barcode128', 'png', 'Brothers_Hotshot_Logistics_Barcode128')" class="flex-1 py-2.5 px-3 rounded-lg bg-[#D4AF37] hover:bg-[#e0bc45] text-black font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-[#D4AF37]/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download PNG (HD)
+          </button>
+          <button onclick="downloadCode('barcode128', 'svg', 'Brothers_Hotshot_Logistics_Barcode128')" class="py-2.5 px-3 rounded-lg bg-[#0B0B0D] hover:bg-gray-900 border border-gray-700 text-gray-200 text-xs font-semibold flex items-center justify-center gap-1 transition">
+            Download SVG
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Encoded Business Details Summary -->
+    <div class="bg-[#171719] border border-gray-800 rounded-2xl p-6 md:p-8">
+      <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#D4AF37]"></span>
+        Encoded Business Details &amp; Metadata
+      </h3>
+      <p class="text-xs text-gray-400 mb-6">All barcodes and QR codes are generated with verified production metadata from Brothers Hotshot Services:</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-[#0B0B0D] border border-gray-800">
+          <div class="text-gray-400 mb-1">Company Name</div>
+          <div class="font-bold text-white text-sm">Brothers Hotshot Services</div>
+        </div>
+        <div class="p-4 rounded-xl bg-[#0B0B0D] border border-gray-800">
+          <div class="text-gray-400 mb-1">Website URL</div>
+          <div class="font-bold text-[#D4AF37] text-sm truncate">https://brothershotshot.ca/</div>
+        </div>
+        <div class="p-4 rounded-xl bg-[#0B0B0D] border border-gray-800">
+          <div class="text-gray-400 mb-1">24/7 Dispatch Phone</div>
+          <div class="font-bold text-white text-sm">+1-587-377-0880</div>
+        </div>
+        <div class="p-4 rounded-xl bg-[#0B0B0D] border border-gray-800">
+          <div class="text-gray-400 mb-1">Operating Base</div>
+          <div class="font-bold text-white text-sm">Red Deer, Alberta, Canada</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 pt-6 border-t border-gray-800/80 text-center text-xs text-gray-500">
+      &copy; Brothers Hotshot Services. All rights reserved. Centrally based in Red Deer, AB serving Western Canada.
+    </footer>
+
+  </div>
+
+  <!-- Pure Self-Contained Barcode & QR Code Engine -->
+  <script>
+    var QRCode = (function() {
+      function QR8BitByte(data) { this.mode = 4; this.data = data; }
+      QR8BitByte.prototype = {
+        getLength: function() { return encodeURI(this.data).replace(/%../g, "i").length; },
+        write: function(buffer) {
+          var utf8 = unescape(encodeURIComponent(this.data));
+          for (var i = 0; i < utf8.length; i++) buffer.put(utf8.charCodeAt(i), 8);
+        }
+      };
+
+      var QRMath = {
+        glog: function(n) { if (n < 1) throw new Error("glog(" + n + ")"); return QRMath.LOG_TABLE[n]; },
+        gexp: function(n) { while (n < 0) n += 255; while (n >= 256) n -= 255; return QRMath.EXP_TABLE[n]; },
+        EXP_TABLE: new Array(256),
+        LOG_TABLE: new Array(256)
+      };
+      for (var i = 0; i < 8; i++) QRMath.EXP_TABLE[i] = 1 << i;
+      for (var i = 8; i < 256; i++) QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
+      for (var i = 0; i < 255; i++) QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
+
+      function QRPolynomial(num, shift) {
+        var offset = 0;
+        while (offset < num.length && num[offset] == 0) offset++;
+        this.num = new Array(num.length - offset + shift);
+        for (var i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
+      }
+      QRPolynomial.prototype = {
+        get: function(index) { return this.num[index]; },
+        getLength: function() { return this.num.length; },
+        multiply: function(e) {
+          var num = new Array(this.getLength() + e.getLength() - 1);
+          for (var i = 0; i < this.getLength(); i++) {
+            for (var j = 0; j < e.getLength(); j++) {
+              num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+            }
+          }
+          return new QRPolynomial(num, 0);
+        },
+        mod: function(e) {
+          if (this.getLength() - e.getLength() < 0) return this;
+          var ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+          var num = new Array(this.getLength());
+          for (var i = 0; i < this.getLength(); i++) num[i] = this.get(i);
+          for (var i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+          return new QRPolynomial(num, 0).mod(e);
+        }
+      };
+
+      var RS_BLOCK_TABLE = [
+        [1, 26, 19], [1, 44, 34], [1, 70, 55], [1, 100, 80], [1, 134, 108],
+        [2, 86, 68], [2, 98, 78], [2, 121, 97], [2, 146, 116], [2, 86, 68, 2, 87, 69]
+      ];
+
+      function QRBitBuffer() { this.buffer = []; this.length = 0; }
+      QRBitBuffer.prototype = {
+        get: function(index) { return ((this.buffer[Math.floor(index / 8)] >>> (7 - index % 8)) & 1) == 1; },
+        put: function(num, length) {
+          for (var i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
+        },
+        putBit: function(bit) {
+          if (this.length == this.buffer.length * 8) this.buffer.push(0);
+          if (bit) this.buffer[Math.floor(this.length / 8)] |= (0x80 >>> (this.length % 8));
+          this.length++;
+        }
+      };
+
+      function QRCodeModel(typeNumber, errorCorrectLevel) {
+        this.typeNumber = typeNumber;
+        this.errorCorrectLevel = errorCorrectLevel;
+        this.modules = null;
+        this.moduleCount = 0;
+        this.dataList = [];
+      }
+      QRCodeModel.prototype = {
+        addData: function(data) { this.dataList.push(new QR8BitByte(data)); },
+        isDark: function(row, col) { return this.modules[row][col]; },
+        getModuleCount: function() { return this.moduleCount; },
+        make: function() {
+          this.moduleCount = this.typeNumber * 4 + 17;
+          this.modules = new Array(this.moduleCount);
+          for (var row = 0; row < this.moduleCount; row++) {
+            this.modules[row] = new Array(this.moduleCount);
+            for (var col = 0; col < this.moduleCount; col++) this.modules[row][col] = null;
+          }
+          this.setupPositionProbePattern(0, 0);
+          this.setupPositionProbePattern(this.moduleCount - 7, 0);
+          this.setupPositionProbePattern(0, this.moduleCount - 7);
+          this.setupTimingPattern();
+          this.setupPositionAdjustPattern();
+          this.mapData(this.createData(), 0);
+        },
+        setupPositionProbePattern: function(row, col) {
+          for (var r = -1; r <= 7; r++) {
+            if (row + r <= -1 || this.moduleCount <= row + r) continue;
+            for (var c = -1; c <= 7; c++) {
+              if (col + c <= -1 || this.moduleCount <= col + c) continue;
+              if ((0 <= r && r <= 6 && (c == 0 || c == 6)) || (0 <= c && c <= 6 && (r == 0 || r == 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                this.modules[row + r][col + c] = true;
+              } else {
+                this.modules[row + r][col + c] = false;
+              }
+            }
+          }
+        },
+        setupTimingPattern: function() {
+          for (var r = 8; r < this.moduleCount - 8; r++) {
+            if (this.modules[r][6] !== null) continue;
+            this.modules[r][6] = (r % 2 == 0);
+          }
+          for (var c = 8; c < this.moduleCount - 8; c++) {
+            if (this.modules[6][c] !== null) continue;
+            this.modules[6][c] = (c % 2 == 0);
+          }
+        },
+        setupPositionAdjustPattern: function() {
+          var pos = [];
+          if (this.typeNumber == 2) pos = [6, 18];
+          else if (this.typeNumber == 3) pos = [6, 22];
+          else if (this.typeNumber == 4) pos = [6, 26];
+          else if (this.typeNumber == 5) pos = [6, 30];
+          else if (this.typeNumber == 6) pos = [6, 34];
+          else if (this.typeNumber == 7) pos = [6, 22, 38];
+          for (var i = 0; i < pos.length; i++) {
+            for (var j = 0; j < pos.length; j++) {
+              var row = pos[i], col = pos[j];
+              if (this.modules[row][col] !== null) continue;
+              for (var r = -2; r <= 2; r++) {
+                for (var c = -2; c <= 2; c++) {
+                  this.modules[row + r][col + c] = (Math.abs(r) == 2 || Math.abs(c) == 2 || (r == 0 && c == 0));
+                }
+              }
+            }
+          }
+        },
+        createData: function() {
+          var buffer = new QRBitBuffer();
+          for (var i = 0; i < this.dataList.length; i++) {
+            var data = this.dataList[i];
+            buffer.put(data.mode, 4);
+            buffer.put(data.getLength(), 8);
+            data.write(buffer);
+          }
+          var rs = RS_BLOCK_TABLE[this.typeNumber - 1];
+          var totalDataCount = (rs.length == 3 ? rs[0] * rs[2] : (rs[0] * rs[2] + rs[3] * rs[5]));
+          if (buffer.length + 4 <= totalDataCount * 8) buffer.put(0, 4);
+          while (buffer.length % 8 != 0) buffer.putBit(false);
+          var pad = 0xEC;
+          while (buffer.length < totalDataCount * 8) {
+            buffer.put(pad, 8);
+            pad = (pad == 0xEC ? 0x11 : 0xEC);
+          }
+          return this.createBytes(buffer, rs);
+        },
+        createBytes: function(buffer, rs) {
+          var offset = 0, blockCount = rs[0], totalDataCount = rs[2], ecCount = (rs[1] - rs[2]);
+          var dcdata = [], ecdata = [];
+          for (var r = 0; r < blockCount; r++) {
+            var dc = [];
+            for (var i = 0; i < totalDataCount; i++) dc.push(buffer.buffer[offset + i]);
+            offset += totalDataCount;
+            var rsPoly = new QRPolynomial([1], 0);
+            for (var i = 0; i < ecCount; i++) rsPoly = rsPoly.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0));
+            var rawPoly = new QRPolynomial(dc, rsPoly.getLength() - 1);
+            var modPoly = rawPoly.mod(rsPoly);
+            var ec = new Array(rsPoly.getLength() - 1);
+            for (var i = 0; i < ec.length; i++) {
+              var modIndex = i + modPoly.getLength() - ec.length;
+              ec[i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0;
+            }
+            dcdata.push(dc);
+            ecdata.push(ec);
+          }
+          var totalCodeCount = 0;
+          for (var i = 0; i < rs[1] * blockCount; i++) totalCodeCount++;
+          var data = new Array(totalCodeCount);
+          var idx = 0;
+          for (var i = 0; i < totalDataCount; i++) {
+            for (var r = 0; r < blockCount; r++) data[idx++] = dcdata[r][i];
+          }
+          for (var i = 0; i < ecCount; i++) {
+            for (var r = 0; r < blockCount; r++) data[idx++] = ecdata[r][i];
+          }
+          return data;
+        },
+        mapData: function(data, maskPattern) {
+          var inc = -1, row = this.moduleCount - 1, bitIndex = 7, byteIndex = 0;
+          for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+            if (col == 6) col--;
+            while (true) {
+              for (var c = 0; c < 2; c++) {
+                if (this.modules[row][col - c] === null) {
+                  var dark = false;
+                  if (byteIndex < data.length) dark = (((data[byteIndex] >>> bitIndex) & 1) == 1);
+                  var mask = ((row + (col - c)) % 2 == 0);
+                  if (mask) dark = !dark;
+                  this.modules[row][col - c] = dark;
+                  bitIndex--;
+                  if (bitIndex == -1) { byteIndex++; bitIndex = 7; }
+                }
+              }
+              row += inc;
+              if (row < 0 || this.moduleCount <= row) {
+                row -= inc;
+                inc = -inc;
+                break;
+              }
+            }
+          }
+          var formatBits = 0x5412;
+          for (var i = 0; i < 15; i++) {
+            var mod = ((formatBits >> i) & 1) == 1;
+            if (i < 6) this.modules[i][8] = mod;
+            else if (i < 8) this.modules[i + 1][8] = mod;
+            else this.modules[this.moduleCount - 15 + i][8] = mod;
+            if (i < 8) this.modules[8][this.moduleCount - i - 1] = mod;
+            else if (i < 9) this.modules[8][15 - i - 1 + 1] = mod;
+            else this.modules[8][15 - i - 1] = mod;
+          }
+          this.modules[this.moduleCount - 8][8] = true;
+        }
+      };
+
+      return {
+        generate: function(text, typeNumber) {
+          if (!typeNumber) {
+            var len = text.length;
+            if (len < 25) typeNumber = 2;
+            else if (len < 45) typeNumber = 3;
+            else if (len < 70) typeNumber = 4;
+            else if (len < 100) typeNumber = 5;
+            else if (len < 140) typeNumber = 6;
+            else typeNumber = 7;
+          }
+          var qr = new QRCodeModel(typeNumber, 1);
+          qr.addData(text);
+          qr.make();
+          return qr;
+        }
+      };
+    })();
+
+    var Code128 = (function() {
+      var PATTERNS = [
+        "212222", "222122", "222221", "121223", "121322", "131222", "122213", "122312", "132212", "221213",
+        "221312", "231212", "112232", "122132", "122231", "113222", "123122", "123221", "223211", "221132",
+        "221231", "213212", "223112", "312131", "311222", "321122", "321221", "312212", "322112", "322211",
+        "212123", "212321", "232121", "111323", "131123", "131321", "112313", "132113", "132311", "211313",
+        "231113", "231311", "112133", "112331", "132131", "113123", "113321", "133121", "313121", "211331",
+        "231131", "213113", "213311", "213131", "311123", "311321", "331121", "312113", "312311", "332111",
+        "314111", "221411", "431111", "111224", "111422", "121124", "121421", "141122", "141221", "112214",
+        "112412", "122114", "122411", "142112", "142211", "241211", "221114", "413111", "241112", "134111",
+        "111242", "121142", "121241", "114212", "124112", "124211", "411212", "421112", "421211", "212141",
+        "214121", "412121", "111143", "111341", "131141", "114113", "114311", "411113", "411311", "113141",
+        "114131", "311141", "411131", "211412", "211214", "211232", "2331112"
+      ];
+      return {
+        encode: function(text) {
+          var codes = [104];
+          var checksum = 104;
+          for (var i = 0; i < text.length; i++) {
+            var val = text.charCodeAt(i) - 32;
+            codes.push(val);
+            checksum += (val * (i + 1));
+          }
+          codes.push(checksum % 103);
+          codes.push(106);
+          var patternStr = "";
+          for (var i = 0; i < codes.length; i++) patternStr += PATTERNS[codes[i]];
+          return patternStr;
+        }
+      };
+    })();
+
+    window.generatedCodes = {};
+
+    function renderQR(containerId, text, key, title) {
+      var qr = QRCode.generate(text);
+      var count = qr.getModuleCount();
+      var cellSize = 6;
+      var margin = 16;
+      var size = count * cellSize + margin * 2;
+      
+      var canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext("2d");
+      
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      
+      ctx.fillStyle = "#0B0B0D";
+      for (var r = 0; r < count; r++) {
+        for (var c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) ctx.fillRect(margin + c * cellSize, margin + r * cellSize, cellSize, cellSize);
+        }
+      }
+
+      var svgRects = [];
+      for (var r = 0; r < count; r++) {
+        for (var c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) svgRects.push('<rect x="' + (margin + c * cellSize) + '" y="' + (margin + r * cellSize) + '" width="' + cellSize + '" height="' + cellSize + '" fill="#0B0B0D" />');
+        }
+      }
+      var svgContent = '<?xml version="1.0" encoding="utf-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '">\n<rect width="' + size + '" height="' + size + '" fill="#ffffff"/>\n' + svgRects.join('\n') + '\n</svg>';
+
+      var container = document.getElementById(containerId);
+      container.innerHTML = "";
+      canvas.className = "max-w-[190px] h-auto shadow rounded-md";
+      container.appendChild(canvas);
+
+      window.generatedCodes[key] = { canvas: canvas, svg: svgContent, title: title };
+    }
+
+    function renderBarcode128(containerId, text, key, title) {
+      var pattern = Code128.encode(text);
+      var barWidth = 2;
+      var barHeight = 85;
+      var margin = 20;
+      var totalWidth = 0;
+      for (var i = 0; i < pattern.length; i++) totalWidth += parseInt(pattern[i]);
+      var width = totalWidth * barWidth + margin * 2;
+      var height = barHeight + margin * 2 + 20;
+
+      var canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      var ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+
+      var curX = margin;
+      var isBar = true;
+      var svgBars = [];
+      for (var i = 0; i < pattern.length; i++) {
+        var w = parseInt(pattern[i]) * barWidth;
+        if (isBar) {
+          ctx.fillStyle = "#0B0B0D";
+          ctx.fillRect(curX, margin, w, barHeight);
+          svgBars.push('<rect x="' + curX + '" y="' + margin + '" width="' + w + '" height="' + barHeight + '" fill="#0B0B0D"/>');
+        }
+        curX += w;
+        isBar = !isBar;
+      }
+
+      ctx.fillStyle = "#0B0B0D";
+      ctx.font = "bold 13px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(text, width / 2, height - 10);
+
+      var svgContent = '<?xml version="1.0" encoding="utf-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + '" width="' + width + '" height="' + height + '">\n<rect width="' + width + '" height="' + height + '" fill="#ffffff"/>\n' + svgBars.join('\n') + '\n<text x="' + (width / 2) + '" y="' + (height - 10) + '" font-family="monospace" font-size="13" font-weight="bold" fill="#0B0B0D" text-anchor="middle">' + text + '</text>\n</svg>';
+
+      var container = document.getElementById(containerId);
+      container.innerHTML = "";
+      canvas.className = "max-w-[280px] w-full h-auto shadow rounded-md";
+      container.appendChild(canvas);
+
+      window.generatedCodes[key] = { canvas: canvas, svg: svgContent, title: title };
+    }
+
+    window.addEventListener("DOMContentLoaded", function() {
+      renderQR("qr-web-container", "https://brothershotshot.ca/", "qr-web", "Brothers Hotshot Website");
+      var vcard = "BEGIN:VCARD\nVERSION:3.0\nN:Services;Brothers Hotshot;;;\nFN:Brothers Hotshot Services\nORG:Brothers Hotshot Services\nTITLE:Hotshot Transportation & Logistics\nTEL;TYPE=WORK,VOICE:+15873770880\nEMAIL;TYPE=WORK:info.brothershotshot@gmail.com\nURL:https://brothershotshot.ca/\nADR;TYPE=WORK:;;5401 48 Ave;Red Deer;AB;T4N 3V3;Canada\nNOTE:24/7 Hotshot Delivery Western Canada\nEND:VCARD";
+      renderQR("qr-vcard-container", vcard, "qr-vcard", "Brothers Hotshot Contact");
+      renderQR("qr-call-container", "tel:+15873770880", "qr-call", "Brothers Hotshot Dispatch");
+      renderBarcode128("barcode128-container", "BROTHERS-HOTSHOT-CA", "barcode128", "Brothers Hotshot Logistics Code 128");
+    });
+
+    window.downloadCode = function(key, format, filename) {
+      var item = window.generatedCodes[key];
+      if (!item) return;
+
+      if (format === 'svg') {
+        var blob = new Blob([item.svg], { type: "image/svg+xml;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename + ".svg";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        var origCanvas = item.canvas;
+        var scale = Math.max(4, Math.floor(2000 / origCanvas.width));
+        var hiResCanvas = document.createElement("canvas");
+        hiResCanvas.width = origCanvas.width * scale;
+        hiResCanvas.height = origCanvas.height * scale;
+        var ctx = hiResCanvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(origCanvas, 0, 0, hiResCanvas.width, hiResCanvas.height);
+
+        hiResCanvas.toBlob(function(blob) {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = filename + ".png";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      }
+    };
+  </script>
+</body>
+</html>

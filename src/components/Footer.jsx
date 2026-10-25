@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, ArrowRight, ChevronRight } from 'lucide-react';
+import { Phone, Mail, MapPin, ArrowRight, ChevronRight, Navigation } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import { SERVICES } from '../data/servicesData';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
+import { LOCATIONS_DATA } from '../data/locationsData';
 
 export default function Footer() {
   const currentYear = 2026;
@@ -149,7 +150,7 @@ export default function Footer() {
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-white font-medium">Direct Phone</p>
+                  <p className="text-white font-medium">Direct Phone (24/7)</p>
                   <a
                     href={BUSINESS_INFO.phoneTel}
                     className="text-[#F5E6B3] hover:text-[#D4AF37] font-mono text-sm block"
@@ -173,7 +174,7 @@ export default function Footer() {
               </div>
 
               <div className="pt-1">
-                <p className="text-xs text-gray-400 font-medium">Service Corridors:</p>
+                <p className="text-xs text-gray-400 font-medium">Provincial Corridors:</p>
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {SERVICE_AREAS.map((area) => (
                     <Link
@@ -190,8 +191,36 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* DELIVERABLE 4: Dedicated Footer SEO Navigation Bar for Local District Hubs */}
+        <div className="mt-10 pt-8 border-t border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+              <Navigation className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Dedicated Western Canada Hotshot Hubs & Programmatic Corridors</span>
+            </h4>
+            <span className="text-[11px] text-gray-500 hidden sm:inline">
+              Point-to-Point Dedicated Freight
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
+            {LOCATIONS_DATA.map((loc) => (
+              <Link
+                key={loc.slug}
+                to={`/service-areas/${loc.slug}`}
+                className="p-2 rounded-lg bg-white/[0.02] border border-white/5 hover:border-[#D4AF37]/40 hover:bg-white/[0.05] transition-all text-gray-400 hover:text-white flex flex-col"
+              >
+                <span className="font-semibold text-gray-200 hover:text-[#D4AF37]">
+                  {loc.name} Hotshot
+                </span>
+                <span className="text-[10px] text-gray-500">{loc.provinceCode} • {loc.dispatchTime.split(" ")[0]} Dispatch</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-xs text-gray-500">
+        <div className="mt-8 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-xs text-gray-500">
           <p>© {currentYear} {BUSINESS_INFO.name}. All rights reserved.</p>
           <p className="text-center md:text-right text-[11px] sm:text-xs">
             Reliable Hotshot Delivery throughout Alberta, Saskatchewan, British Columbia, Manitoba & Winnipeg.

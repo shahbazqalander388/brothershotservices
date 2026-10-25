@@ -1,45 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://brothershotshot.ca/</loc>
-    <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://brothershotshot.ca</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca" />
   </url>
   <url>
     <loc>https://brothershotshot.ca/services</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/services" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/services" />
   </url>
   <url>
     <loc>https://brothershotshot.ca/service-areas</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas" />
   </url>
   <url>
     <loc>https://brothershotshot.ca/quote</loc>
-    <lastmod>2026-10-18</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/quote" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/quote" />
   </url>
   <url>
     <loc>https://brothershotshot.ca/about</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/about" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/about" />
   </url>
   <url>
     <loc>https://brothershotshot.ca/contact</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/contact" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/contact" />
   </url>
   <url>
     <loc>https://brothershotshot.ca/careers</loc>
-    <lastmod>2026-10-18</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/careers" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/careers" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-delivery-red-deer</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-delivery-red-deer" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-delivery-red-deer" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-trucking-calgary</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-trucking-calgary" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-trucking-calgary" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-freight-edmonton</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-freight-edmonton" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-freight-edmonton" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/urgent-hotshot-fort-mcmurray</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/urgent-hotshot-fort-mcmurray" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/urgent-hotshot-fort-mcmurray" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-delivery-grande-prairie</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-delivery-grande-prairie" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-delivery-grande-prairie" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-trucking-saskatoon</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-trucking-saskatoon" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-trucking-saskatoon" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-freight-regina</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-freight-regina" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-freight-regina" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-delivery-lloydminster</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-delivery-lloydminster" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-delivery-lloydminster" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-delivery-winnipeg</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-delivery-winnipeg" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-delivery-winnipeg" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-trucking-vancouver</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-trucking-vancouver" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-trucking-vancouver" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-freight-kamloops</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-freight-kamloops" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-freight-kamloops" />
+  </url>
+  <url>
+    <loc>https://brothershotshot.ca/service-areas/hotshot-trucking-prince-george</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://brothershotshot.ca/service-areas/hotshot-trucking-prince-george" />
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://brothershotshot.ca/service-areas/hotshot-trucking-prince-george" />
   </url>
 </urlset>

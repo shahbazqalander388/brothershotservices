@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Navigation, ArrowRight } from 'lucide-react';
+import { MapPin, Navigation, ArrowRight, Clock, ChevronRight } from 'lucide-react';
 import { SERVICE_AREAS } from '../data/serviceAreasData';
+import { LOCATIONS_DATA } from '../data/locationsData';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import SEO from '../components/SEO';
 
@@ -53,7 +54,55 @@ export default function ServiceAreasPage() {
         </div>
       </section>
 
-      {/* Service Area Cards (No Placeholder Images) */}
+      {/* Programmatic Local Hubs Section */}
+      <section className="py-12 sm:py-16 bg-[#101015] border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="space-y-2 mb-8">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#D4AF37]">
+              Dedicated City & Industrial Hubs
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+              Explore Local Hotshot Dispatch Locations
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-400 max-w-2xl">
+              Select your specific city or region to view localized dispatch times, key landmarks, highway corridors, and tailored freight options.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {LOCATIONS_DATA.map((loc) => (
+              <Link
+                key={loc.slug}
+                to={`/service-areas/${loc.slug}`}
+                className="p-5 rounded-2xl bg-[#16161B] border border-white/10 hover:border-[#D4AF37]/50 hover:bg-white/[0.03] transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                    <span className="font-bold text-[#D4AF37]">{loc.provinceCode}</span>
+                    <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                      <Clock className="w-3 h-3 text-[#D4AF37]" />
+                      {loc.dispatchTime.split(" ")[0]}
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-[#D4AF37] transition-colors mb-1">
+                    {loc.name}
+                  </h3>
+                  <p className="text-xs text-gray-400 line-clamp-2">
+                    {loc.regionTitle}
+                  </p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-gray-300 group-hover:text-[#D4AF37]">
+                  <span>Explore Route Details</span>
+                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-[#D4AF37] group-hover:translate-x-1 transition-all" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Service Area Cards */}
       <section className="py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">

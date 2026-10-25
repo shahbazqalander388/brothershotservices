@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ServicesPage from './pages/ServicesPage';
 import ServiceAreasPage from './pages/ServiceAreasPage';
+import LocationDetailPage from './pages/LocationDetailPage';
 import CareersPage from './pages/CareersPage';
 import QuotePage from './pages/QuotePage';
 import ContactPage from './pages/ContactPage';
@@ -25,6 +26,8 @@ export default function App() {
           <Route path="/deliveries" element={<ServicesPage />} />
           <Route path="/delivery-services" element={<ServicesPage />} />
           <Route path="/service-areas" element={<ServiceAreasPage />} />
+          <Route path="/service-areas/:slug" element={<LocationDetailPage />} />
+          <Route path="/locations/:slug" element={<LocationDetailPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/quote" element={<QuotePage />} />
           <Route path="/contact" element={<ContactPage />} />

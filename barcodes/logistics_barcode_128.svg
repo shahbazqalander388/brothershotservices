@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 180" width="540" height="180">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .bar { fill: #0B0B0D; }
+      .txt { font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; fill: #0B0B0D; text-anchor: middle; letter-spacing: 2px; }
+      .brand { font-family: Arial, sans-serif; font-size: 11px; font-weight: bold; fill: #8E6B17; text-anchor: middle; letter-spacing: 1px; }
+    </style>
+  </defs>
+  <rect width="540" height="180" rx="8" class="bg"/>
+  <text x="270" y="24" class="brand">BROTHERS HOTSHOT SERVICES • CARGO &amp; FREIGHT</text>
+  
+  <!-- Code 128 Barcode Pattern for "BROTHERS-HOTSHOT-CA" -->
+  <g transform="translate(35, 38)">
+    <!-- Start B (104): 211214 -->
+    <rect x="0" y="0" width="4" height="90" class="bar"/>
+    <rect x="6" y="0" width="2" height="90" class="bar"/>
+    <rect x="12" y="0" width="2" height="90" class="bar"/>
+    <!-- B (34): 131123 -->
+    <rect x="22" y="0" width="2" height="90" class="bar"/>
+    <rect x="30" y="0" width="2" height="90" class="bar"/>
+    <rect x="34" y="0" width="4" height="90" class="bar"/>
+    <!-- R (50): 231131 -->
+    <rect x="44" y="0" width="4" height="90" class="bar"/>
+    <rect x="54" y="0" width="2" height="90" class="bar"/>
+    <rect x="58" y="0" width="6" height="90" class="bar"/>
+    <!-- O (47): 133121 -->
+    <rect x="66" y="0" width="2" height="90" class="bar"/>
+    <rect x="74" y="0" width="6" height="90" class="bar"/>
+    <rect x="82" y="0" width="4" height="90" class="bar"/>
+    <!-- T (52): 213311 -->
+    <rect x="88" y="0" width="4" height="90" class="bar"/>
+    <rect x="94" y="0" width="6" height="90" class="bar"/>
+    <rect x="106" y="0" width="2" height="90" class="bar"/>
+    <!-- H (40): 231113 -->
+    <rect x="110" y="0" width="4" height="90" class="bar"/>
+    <rect x="120" y="0" width="2" height="90" class="bar"/>
+    <rect x="124" y="0" width="2" height="90" class="bar"/>
+    <!-- E (37): 132113 -->
+    <rect x="132" y="0" width="2" height="90" class="bar"/>
+    <rect x="140" y="0" width="4" height="90" class="bar"/>
+    <rect x="146" y="0" width="2" height="90" class="bar"/>
+    <!-- R (50): 231131 -->
+    <rect x="154" y="0" width="4" height="90" class="bar"/>
+    <rect x="164" y="0" width="2" height="90" class="bar"/>
+    <rect x="168" y="0" width="6" height="90" class="bar"/>
+    <!-- S (51): 213113 -->
+    <rect x="176" y="0" width="4" height="90" class="bar"/>
+    <rect x="182" y="0" width="6" height="90" class="bar"/>
+    <rect x="190" y="0" width="2" height="90" class="bar"/>
+    <!-- - (13): 122132 -->
+    <rect x="198" y="0" width="2" height="90" class="bar"/>
+    <rect x="204" y="0" width="4" height="90" class="bar"/>
+    <rect x="210" y="0" width="6" height="90" class="bar"/>
+    <!-- H (40): 231113 -->
+    <rect x="220" y="0" width="4" height="90" class="bar"/>
+    <rect x="230" y="0" width="2" height="90" class="bar"/>
+    <rect x="234" y="0" width="2" height="90" class="bar"/>
+    <!-- O (47): 133121 -->
+    <rect x="242" y="0" width="2" height="90" class="bar"/>
+    <rect x="250" y="0" width="6" height="90" class="bar"/>
+    <rect x="258" y="0" width="4" height="90" class="bar"/>
+    <!-- T (52): 213311 -->
+    <rect x="264" y="0" width="4" height="90" class="bar"/>
+    <rect x="270" y="0" width="6" height="90" class="bar"/>
+    <rect x="282" y="0" width="2" height="90" class="bar"/>
+    <!-- S (51): 213113 -->
+    <rect x="286" y="0" width="4" height="90" class="bar"/>
+    <rect x="292" y="0" width="6" height="90" class="bar"/>
+    <rect x="300" y="0" width="2" height="90" class="bar"/>
+    <!-- H (40): 231113 -->
+    <rect x="308" y="0" width="4" height="90" class="bar"/>
+    <rect x="318" y="0" width="2" height="90" class="bar"/>
+    <rect x="322" y="0" width="2" height="90" class="bar"/>
+    <!-- O (47): 133121 -->
+    <rect x="330" y="0" width="2" height="90" class="bar"/>
+    <rect x="338" y="0" width="6" height="90" class="bar"/>
+    <rect x="346" y="0" width="4" height="90" class="bar"/>
+    <!-- T (52): 213311 -->
+    <rect x="352" y="0" width="4" height="90" class="bar"/>
+    <rect x="358" y="0" width="6" height="90" class="bar"/>
+    <rect x="370" y="0" width="2" height="90" class="bar"/>
+    <!-- - (13): 122132 -->
+    <rect x="374" y="0" width="2" height="90" class="bar"/>
+    <rect x="380" y="0" width="4" height="90" class="bar"/>
+    <rect x="386" y="0" width="6" height="90" class="bar"/>
+    <!-- C (35): 131321 -->
+    <rect x="396" y="0" width="2" height="90" class="bar"/>
+    <rect x="404" y="0" width="2" height="90" class="bar"/>
+    <rect x="410" y="0" width="4" height="90" class="bar"/>
+    <!-- A (33): 111323 -->
+    <rect x="418" y="0" width="2" height="90" class="bar"/>
+    <rect x="422" y="0" width="2" height="90" class="bar"/>
+    <rect x="428" y="0" width="4" height="90" class="bar"/>
+    <!-- Checksum (41): 231311 -->
+    <rect x="438" y="0" width="4" height="90" class="bar"/>
+    <rect x="448" y="0" width="2" height="90" class="bar"/>
+    <rect x="454" y="0" width="2" height="90" class="bar"/>
+    <!-- Stop (106): 2331112 -->
+    <rect x="458" y="0" width="4" height="90" class="bar"/>
+    <rect x="468" y="0" width="6" height="90" class="bar"/>
+    <rect x="476" y="0" width="2" height="90" class="bar"/>
+    <rect x="480" y="0" width="4" height="90" class="bar"/>
+  </g>
+
+  <!-- Human Readable Text -->
+  <text x="270" y="152" class="txt">BROTHERS-HOTSHOT-CA</text>
+  <text x="270" y="168" font-family="Arial, sans-serif" font-size="9" fill="#73767B" text-anchor="middle">Red Deer, AB • +1-587-377-0880 • brothershotshot.ca</text>
+</svg>
